@@ -39,7 +39,7 @@ displayName="Mountables" #mandatory
 logoFile="examplemod.png" #optional
 
 # A text field displayed in the mod UI
-credits="" #optional
+credits="Commissioned by The Ult1mate Guy" #optional
 
 # A text field displayed in the mod UI
 authors="Luke Graham Landry" #optional
