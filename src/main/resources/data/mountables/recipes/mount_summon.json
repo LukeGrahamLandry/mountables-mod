@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iii",
+    "ici",
+    "iii"
+  ],
+  "key": {
+    "c": {
+      "item": "mountables:mount_core"
+    },
+    "i": {
+      "tag": "mountables:mount_recipe"
+    }
+  },
+  "result": {
+    "item": "mountables:mount_summon"
+  }
+}
