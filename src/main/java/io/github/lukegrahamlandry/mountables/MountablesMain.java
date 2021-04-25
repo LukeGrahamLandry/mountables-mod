@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables;
 
+import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.SheepEntity;
@@ -19,6 +20,7 @@ public class MountablesMain {
     public MountablesMain() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         MountTypes.ENTITY_TYPES.register(modEventBus);
+        ItemInit.ITEMS.register(modEventBus);
         modEventBus.addListener(MountablesMain::mobAttributes);
     }
 
