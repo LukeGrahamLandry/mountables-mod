@@ -3,6 +3,8 @@ package io.github.lukegrahamlandry.mountables;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -25,6 +27,8 @@ public class MountablesMain {
     }
 
     public static void mobAttributes(EntityAttributeCreationEvent event){
-        event.put((EntityType<SheepEntity>) MountTypes.get(EntityType.SHEEP), SheepEntity.createAttributes().build());
+        for (EntityType type : MountTypes.getMountTypes()){
+            event.put(MountTypes.get(type), MobEntity.createMobAttributes().add(Attributes.MAX_HEALTH, 20.0D).add(Attributes.MOVEMENT_SPEED, (double)0.23F).build());
+        }
     }
 }

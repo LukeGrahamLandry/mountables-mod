@@ -16,6 +16,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class MountTypes {
     public static DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITIES, MountablesMain.MOD_ID);
@@ -28,6 +29,9 @@ public class MountTypes {
     }
     public static EntityType<?> getToCraft(Item item) {
         return mountRecipeLookup.get(item);
+    }
+    public static Set<EntityType<? extends LivingEntity>> getMountTypes() {
+        return mountLookup.keySet();
     }
 
     private static void create(EntityType<? extends LivingEntity> vanillaType, EntityType.IFactory factory, Item recipe){
@@ -44,5 +48,6 @@ public class MountTypes {
     static {
         create(EntityType.SHEEP, SheepMount::new, Items.MUTTON);
         create(EntityType.PIG, PigEntity::new, Items.PORKCHOP);
+        create(EntityType.COW, CowMount::new, Items.BEEF);
     }
 }
