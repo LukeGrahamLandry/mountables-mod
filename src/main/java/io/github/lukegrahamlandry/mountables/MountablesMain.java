@@ -28,7 +28,7 @@ public class MountablesMain {
 
     public static void mobAttributes(EntityAttributeCreationEvent event){
         for (EntityType type : MountTypes.getMountTypes()){
-            event.put(MountTypes.get(type), MobEntity.createMobAttributes().add(Attributes.MAX_HEALTH, 20.0D).add(Attributes.MOVEMENT_SPEED, (double)0.23F).build());
+            event.put(MountTypes.get(type).getType(), MobEntity.createMobAttributes().add(Attributes.MAX_HEALTH, 20.0D).add(Attributes.MOVEMENT_SPEED, (double)0.23F).build());
         }
     }
 }

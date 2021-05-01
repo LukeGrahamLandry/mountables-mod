@@ -1,6 +1,5 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -8,64 +7,46 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
+import net.minecraft.item.Food;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effects;
-import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 
-public class CowMount extends CowEntity implements IJumpingMount{
+public class MountEntity extends CowEntity implements IJumpingMount{
     private boolean standing = true;
 
-    public CowMount(EntityType<? extends CowEntity> p_i48567_1_, World p_i48567_2_) {
+    public MountEntity(EntityType<? extends CowEntity> p_i48567_1_, World p_i48567_2_) {
         super(p_i48567_1_, p_i48567_2_);
         this.maxUpStep = 1;
     }
 
-    private int eatingCounter;
-    private int mouthCounter;
     private int standCounter;
     public int tailCounter;
     public int sprintCounter;
     protected boolean isJumping;
     protected Inventory inventory;
-    protected int temper;
     protected float playerJumpPendingScale;
     private boolean allowStandSliding;
     private float eatAnim;
     private float eatAnimO;
     private float standAnim;
     private float standAnimO;
-    private float mouthAnim;
-    private float mouthAnimO;
     protected boolean canGallop = true;
     protected int gallopSoundCounter;
-
 
     public boolean isJumping() {
         return this.isJumping;
@@ -78,8 +59,6 @@ public class CowMount extends CowEntity implements IJumpingMount{
     public boolean isStanding() {
         return this.standing;
     }
-
-
 
     public boolean isSaddled() {
         return true;
@@ -353,32 +332,8 @@ public class CowMount extends CowEntity implements IJumpingMount{
         this.playSound(SoundEvents.HORSE_JUMP, 0.4F, 1.0F);
     }
 
-    protected void setOffspringAttributes(AgeableEntity p_190681_1_, AbstractHorseEntity p_190681_2_) {
-        double d0 = this.getAttributeBaseValue(Attributes.MAX_HEALTH) + p_190681_1_.getAttributeBaseValue(Attributes.MAX_HEALTH) + (double)this.generateRandomMaxHealth();
-        p_190681_2_.getAttribute(Attributes.MAX_HEALTH).setBaseValue(d0 / 3.0D);
-        double d1 = this.getAttributeBaseValue(Attributes.JUMP_STRENGTH) + p_190681_1_.getAttributeBaseValue(Attributes.JUMP_STRENGTH) + this.generateRandomJumpStrength();
-        p_190681_2_.getAttribute(Attributes.JUMP_STRENGTH).setBaseValue(d1 / 3.0D);
-        double d2 = this.getAttributeBaseValue(Attributes.MOVEMENT_SPEED) + p_190681_1_.getAttributeBaseValue(Attributes.MOVEMENT_SPEED) + this.generateRandomSpeed();
-        p_190681_2_.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue(d2 / 3.0D);
-    }
-
     public boolean canBeControlledByRider() {
         return this.getControllingPassenger() instanceof LivingEntity;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public float getEatAnim(float p_110258_1_) {
-        return MathHelper.lerp(p_110258_1_, this.eatAnimO, this.eatAnim);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public float getStandAnim(float p_110223_1_) {
-        return MathHelper.lerp(p_110223_1_, this.standAnimO, this.standAnim);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public float getMouthAnim(float p_110201_1_) {
-        return MathHelper.lerp(p_110201_1_, this.mouthAnimO, this.mouthAnim);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -515,6 +470,30 @@ public class CowMount extends CowEntity implements IJumpingMount{
 
         ItemStack itemstack = p_230254_1_.getItemInHand(p_230254_2_);
         if (!itemstack.isEmpty()) {
+
+            // eat food
+            Food food = itemstack.getItem().getFoodProperties();
+            if (food != null){
+                if (!level.isClientSide()){
+                    // regen
+                    int toHeal = Math.floorDiv(food.getNutrition(), 3);
+                    if (toHeal / 3 >= 1){
+                        this.heal(toHeal);
+                    }
+                    // effects
+                    food.getEffects().forEach((pair) -> {
+                        if (pair.getFirst() != null && random.nextFloat() < pair.getSecond()) this.addEffect(pair.getFirst());
+                    });
+                    // particles
+                    for(int i = 0; i < 10; ++i) {
+                        ((ServerWorld)level).sendParticles(ParticleTypes.HEART, getX() + (random.nextDouble() * 4 - 2), getY() + 1, getZ() + (random.nextDouble() * 4 - 2), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                    }
+                }
+                // take
+                itemstack.shrink(1);
+                return ActionResultType.CONSUME;
+            }
+
             ActionResultType actionresulttype = itemstack.interactLivingEntity(p_230254_1_, this, p_230254_2_);
             if (actionresulttype.consumesAction()) {
                 return actionresulttype;
