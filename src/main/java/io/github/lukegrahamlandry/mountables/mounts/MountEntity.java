@@ -25,12 +25,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.apache.logging.log4j.core.jmx.Server;
+import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
@@ -40,10 +39,12 @@ import java.util.UUID;
 public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Integer> TEXTURE = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
     private static final DataParameter<String> VANILLA_TYPE = EntityDataManager.defineId(MountEntity.class, DataSerializers.STRING);
+    private static final DataParameter<Boolean> CAN_FLY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     public static final int maxHealth = 7;
 
     private ItemStack summonStack;
     private EntityType vanillaType;
+
     public void setMountType(ItemStack stack){
         this.summonStack = stack.copy();
         this.vanillaType = MountSummonItem.getType(stack);
@@ -52,12 +53,13 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         int health = stack.getTag().getInt("health");
         this.setHealth(health);
         this.entityData.set(VANILLA_TYPE, EntityType.getKey(this.vanillaType).toString());
+        this.entityData.set(CAN_FLY, stack.getTag().getBoolean("canfly"));
     }
 
     @Override
     protected void dropCustomDeathLoot(DamageSource p_213333_1_, int p_213333_2_, boolean p_213333_3_) {
         super.dropCustomDeathLoot(p_213333_1_, p_213333_2_, p_213333_3_);
-        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 1);
+        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 1, this.canFly());
         this.spawnAtLocation(summonStack);
     }
 
@@ -73,6 +75,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+        MountablesMain.LOGGER.debug("canfly: " + this.canFly());
         if (this.isVehicle()) {
             return super.mobInteract(player, hand);
         }
@@ -83,9 +86,13 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (this.vanillaType == EntityType.SHEEP) textureSuccess = updateSheepTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.COW) textureSuccess = updateCowTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.PIG) textureSuccess = updatePigTexture(itemstack.getItem());
+            if (itemstack.getItem() == Items.FEATHER) {
+                textureSuccess = true;
+                this.entityData.set(CAN_FLY, true);
+            }
             if (textureSuccess){
                 if (itemstack.getItem() != Items.SHEARS) itemstack.shrink(1);
-                return ActionResultType.CONSUME;
+                return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
 
             // eat food
@@ -117,6 +124,13 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             }
         }
 
+        if (player.isShiftKeyDown() && player.getUUID() == this.owner && player.getItemInHand(hand).isEmpty() && hand == Hand.MAIN_HAND){
+            MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 1, this.canFly());
+            player.setItemInHand(hand, this.summonStack);
+            this.remove();
+            return ActionResultType.SUCCESS;
+        }
+
         this.doPlayerRide(player);
         return ActionResultType.sidedSuccess(this.level.isClientSide);
     }
@@ -132,6 +146,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         super.defineSynchedData();
         this.entityData.define(TEXTURE, 0);
         this.entityData.define(VANILLA_TYPE, "");
+        this.entityData.define(CAN_FLY, false);
     }
 
     public void setTextureType(int x){
@@ -162,6 +177,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         stack.setTag(nbt.getCompound("summon"));
         this.setMountType(stack);
         this.owner = nbt.getUUID("owner");
+    }
+
+    private boolean canFly() {
+        return this.entityData.get(CAN_FLY);
     }
 
     private UUID owner;
@@ -284,7 +303,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         }
 
         int i = this.calculateFallDamage(p_225503_1_, p_225503_2_);
-        if (i <= 0) {
+        if (i <= 0 || this.canFly()) {
             return false;
         } else {
             this.hurt(DamageSource.FALL, (float)i);
@@ -375,12 +394,12 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return 400;
     }
 
-    protected void doPlayerRide(PlayerEntity p_110237_1_) {
+    protected void doPlayerRide(PlayerEntity player) {
         this.setStanding(false);
-        if (!this.level.isClientSide) {
-            p_110237_1_.yRot = this.yRot;
-            p_110237_1_.xRot = this.xRot;
-            p_110237_1_.startRiding(this);
+        if (!this.level.isClientSide && player.getUUID() == this.owner) {
+            player.yRot = this.yRot;
+            player.xRot = this.xRot;
+            player.startRiding(this);
         }
 
     }
@@ -409,6 +428,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     public void tick() {
         super.tick();
+
+        // fall if you dismount while flying
+        if (this.isNoGravity() && !this.isVehicle()) this.setNoGravity(false);
 
         if ((this.isControlledByLocalInstance() || this.isEffectiveAi()) && this.standCounter > 0 && ++this.standCounter > 20) {
             this.standCounter = 0;
@@ -457,9 +479,62 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
 
-    public void travel(Vector3d p_213352_1_) {
+    boolean isFlying = false;
+    final double flightSpeed = 0.25D;
+    public void travel(Vector3d travelVec) {
         if (this.isAlive()) {
-            if (this.isVehicle() && this.canBeControlledByRider() && this.isSaddled()) {
+            if (this.isVehicle() && this.canFly()){
+                LivingEntity rider = (LivingEntity) this.getPassengers().get(0);
+
+
+                this.setOnGround(!isFlying);
+
+                if (isFlying) {
+                    this.setNoGravity(true);
+
+                    this.yRot = rider.yRot;
+                    this.yRotO = this.yRot;
+
+                    double yComponent = 0;
+                    double moveForward = 0;
+
+                    if (rider.zza > 0) {
+                        moveForward = flightSpeed;
+                        this.xRot = -MathHelper.clamp(rider.xRot, -10, 10);
+                        this.setRot(this.yRot, this.xRot);
+                        if (rider.xRot < -10 || rider.xRot > 10) {
+                            yComponent = -(Math.toRadians(rider.xRot) * flightSpeed);
+                            if (!isFlying && yComponent > 0) isFlying = true;  // that makes no sense?
+                            else if (isFlying && yComponent < 0 && !this.level.getBlockState(this.blockPosition().below(2)).isAir())  // !isAir should be isSolid
+                                isFlying = false;
+                        }
+                    } else if (rider.zza < 0) {
+                        moveForward = -flightSpeed;
+                        this.xRot = -MathHelper.clamp(rider.xRot, -10, 10);
+                        this.setRot(this.yRot, this.xRot);
+                        if (rider.xRot < -10 || rider.xRot > 10) {
+                            yComponent = (Math.toRadians(rider.xRot) * flightSpeed);
+                            if (!isFlying && yComponent > 0) isFlying = true;
+                            else if (isFlying && yComponent < 0 && !this.level.getBlockState(this.blockPosition().below(2)).isAir())  // !isAir should be isSolid
+                                isFlying = false;
+                        }
+                    }
+
+                    if (this.isControlledByLocalInstance()){
+                        this.flyingSpeed = (float) flightSpeed;
+                        // this.setSpeed((float) flightSpeed);
+                        super.travel(new Vector3d(rider.xxa, yComponent, moveForward));
+                    } else if (rider instanceof PlayerEntity) {
+                        this.setDeltaMovement(Vector3d.ZERO);
+                    }
+
+                    return;
+                } else {
+                    this.setNoGravity(false);
+                }
+            }
+
+            if (this.isVehicle() && this.canBeControlledByRider()) {
                 LivingEntity livingentity = (LivingEntity)this.getControllingPassenger();
                 this.yRot = livingentity.yRot;
                 this.yRotO = this.yRot;
@@ -492,7 +567,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     this.setDeltaMovement(vector3d.x, d1, vector3d.z);
                     this.setIsJumping(true);
                     this.hasImpulse = true;
-                    net.minecraftforge.common.ForgeHooks.onLivingJump(this);
+                    ForgeHooks.onLivingJump(this);
                     if (f1 > 0.0F) {
                         float f2 = MathHelper.sin(this.yRot * ((float)Math.PI / 180F));
                         float f3 = MathHelper.cos(this.yRot * ((float)Math.PI / 180F));
@@ -505,7 +580,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 this.flyingSpeed = this.getSpeed() * 0.1F;
                 if (this.isControlledByLocalInstance()) {
                     this.setSpeed((float)this.getAttributeValue(Attributes.MOVEMENT_SPEED));
-                    super.travel(new Vector3d((double)f, p_213352_1_.y, (double)f1));
+                    super.travel(new Vector3d((double)f, travelVec.y, (double)f1));
                 } else if (livingentity instanceof PlayerEntity) {
                     this.setDeltaMovement(Vector3d.ZERO);
                 }
@@ -516,10 +591,14 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 }
 
                 this.calculateEntityAnimation(this, false);
+
+                if (livingentity.xRot < -25 && livingentity.zza > 0) isFlying = true;  // flight logic?
             } else {
                 this.flyingSpeed = 0.02F;
-                super.travel(p_213352_1_);
+                super.travel(travelVec);
             }
+
+
         }
     }
 
