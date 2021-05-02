@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iai",
+    "aca",
+    "iai"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "a": {
+      "item": "minecraft:leather"
+    },
+    "c": {
+      "item": "minecraft:tripwire_hook"
+    }
+  },
+  "result": {
+    "item": "mountables:mount_core"
+  }
+}

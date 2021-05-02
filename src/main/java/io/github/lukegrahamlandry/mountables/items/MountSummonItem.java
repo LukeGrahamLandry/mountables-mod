@@ -3,8 +3,10 @@ package io.github.lukegrahamlandry.mountables.items;
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
+import io.github.lukegrahamlandry.mountables.util.KeyboardHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -18,12 +20,15 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 
 public class MountSummonItem extends Item {
@@ -39,11 +44,19 @@ public class MountSummonItem extends Item {
         });
     }
 
-    static EntityType<CreeperEntity> defaultType = EntityType.CREEPER;
+    @Override
+    public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        if (getType(stack) != null) {  // KeyboardHelper.isHoldingShift() &&
+            tooltip.add(getType(stack).getDescription());
+        }
+
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
+    }
+
     public static EntityType getType(ItemStack stack){
-        if (!stack.hasTag()) return defaultType;
+        if (!stack.hasTag()) return null;
         String typeName = stack.getTag().getString("typeid");
-        return EntityType.byString(typeName).orElse(defaultType);
+        return EntityType.byString(typeName).orElse(null);
     }
 
     public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health){
@@ -56,6 +69,7 @@ public class MountSummonItem extends Item {
     }
 
     public static int getItemColor(ItemStack stack, int tintIndex){
+        if (getType(stack) == null) return tintIndex == 0 ? 0XFFFFFF : 0;
         SpawnEggItem egg = eggs.get(getType(stack));
         if (tintIndex == 0 || egg == null){
             return 0XFFFFFF;
@@ -83,9 +97,11 @@ public class MountSummonItem extends Item {
             }
 
             EntityType<?> entitytype = MountTypes.get(getType(itemstack)).getType();
+            // EntityType#spawn sets the entity's name to the name of the item stack you pass in
             Entity summon = entitytype.spawn((ServerWorld)world, itemstack, context.getPlayer(), blockpos1, SpawnReason.SPAWN_EGG, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP);
             if (summon != null) {
                 ((MountEntity)summon).setMountType(itemstack);
+                ((MountEntity)summon).setOwner(context.getPlayer());
                 itemstack.shrink(1);
             }
 

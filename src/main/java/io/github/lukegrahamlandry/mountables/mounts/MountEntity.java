@@ -9,6 +9,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
@@ -23,14 +24,18 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.core.jmx.Server;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Integer> TEXTURE = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
@@ -54,6 +59,17 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         super.dropCustomDeathLoot(p_213333_1_, p_213333_2_, p_213333_3_);
         MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 1);
         this.spawnAtLocation(summonStack);
+    }
+
+    @Override
+    public void setCustomName(@Nullable ITextComponent text) {
+        super.setCustomName(text);
+        if (this.summonStack != null) this.summonStack.setHoverName(text);
+    }
+
+    @Override
+    public void checkDespawn() {
+        // super.checkDespawn();
     }
 
     public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
@@ -106,6 +122,12 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     @Override
+    protected void registerGoals() {
+        this.goalSelector.addGoal(1, new SwimGoal(this));
+        this.goalSelector.addGoal(1, new FollowGoal(this, 1.25, 10, 2, false));
+    }
+
+    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(TEXTURE, 0);
@@ -130,6 +152,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.summonStack.getTag().putInt("health", (int) this.getHealth());
         this.summonStack.getTag().putInt("texturetype", this.getTextureType());
         nbt.put("summon", this.summonStack.getTag());
+        nbt.putUUID("owner", this.owner);
     }
 
     @Override
@@ -138,6 +161,17 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         ItemStack stack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
         stack.setTag(nbt.getCompound("summon"));
         this.setMountType(stack);
+        this.owner = nbt.getUUID("owner");
+    }
+
+    private UUID owner;
+
+    public void setOwner(Entity entity) {
+        this.owner = entity.getUUID();
+    }
+
+    public LivingEntity getOwner() {
+        return (LivingEntity) ((ServerWorld)level).getEntity(this.owner);
     }
 
     // *** TEXTURE TYPES BY ENTITY *** //
