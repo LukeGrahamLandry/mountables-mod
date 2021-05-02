@@ -28,10 +28,10 @@ import java.util.function.Supplier;
 public class RenderHandler {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        for (EntityType type : MountTypes.getMountTypes()){
-            MountTypes.MountTypeData thing = MountTypes.get(type);
+        for (EntityType vanillaType : MountTypes.getMountTypes()){
+            MountTypes.MountTypeData thing = MountTypes.get(vanillaType);
             RenderingRegistry.registerEntityRenderingHandler(thing.getType(), (manager) -> {
-                return new GenericMountRenderer<>(manager, thing.textureLocation, thing.modelFactory);
+                return new GenericMountRenderer<>(manager, vanillaType, thing.textureLocation, thing.modelFactory);
             });
         }
     }

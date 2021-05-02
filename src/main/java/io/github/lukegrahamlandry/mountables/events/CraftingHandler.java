@@ -3,6 +3,7 @@ package io.github.lukegrahamlandry.mountables.events;
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
+import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +21,6 @@ public class CraftingHandler {
         MountablesMain.LOGGER.debug(recipeItem);
         EntityType type = MountTypes.getToCraft(recipeItem);
         MountablesMain.LOGGER.debug(type);
-        MountSummonItem.writeNBT(event.getCrafting(), type, 0);
+        MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth);
     }
 }

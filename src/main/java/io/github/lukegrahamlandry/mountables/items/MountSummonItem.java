@@ -2,6 +2,7 @@ package io.github.lukegrahamlandry.mountables.items;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
+import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -39,17 +40,18 @@ public class MountSummonItem extends Item {
     }
 
     static EntityType<CreeperEntity> defaultType = EntityType.CREEPER;
-    private static EntityType getType(ItemStack stack){
+    public static EntityType getType(ItemStack stack){
         if (!stack.hasTag()) return defaultType;
         String typeName = stack.getTag().getString("typeid");
         return EntityType.byString(typeName).orElse(defaultType);
     }
 
-    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType){
+    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health){
         CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
         MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
         tag.putString("typeid", EntityType.getKey(type).toString());
         tag.putInt("texturetype", textureType);
+        tag.putInt("health", health);
         stack.setTag(tag);
     }
 
@@ -81,7 +83,9 @@ public class MountSummonItem extends Item {
             }
 
             EntityType<?> entitytype = MountTypes.get(getType(itemstack)).getType();
-            if (entitytype.spawn((ServerWorld)world, itemstack, context.getPlayer(), blockpos1, SpawnReason.SPAWN_EGG, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP) != null) {
+            Entity summon = entitytype.spawn((ServerWorld)world, itemstack, context.getPlayer(), blockpos1, SpawnReason.SPAWN_EGG, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP);
+            if (summon != null) {
+                ((MountEntity)summon).setMountType(itemstack);
                 itemstack.shrink(1);
             }
 

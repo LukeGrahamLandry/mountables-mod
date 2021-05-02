@@ -1,17 +1,21 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
+import io.github.lukegrahamlandry.mountables.MountablesMain;
+import io.github.lukegrahamlandry.mountables.init.ItemInit;
+import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
-import net.minecraft.entity.ai.attributes.AttributeModifierMap;
 import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.CowEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Food;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.*;
@@ -25,11 +29,181 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MountEntity extends CowEntity implements IJumpingMount{
-    private boolean standing = true;
+public class MountEntity extends CreatureEntity implements IJumpingMount{
+    private static final DataParameter<Integer> TEXTURE = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
+    private static final DataParameter<String> VANILLA_TYPE = EntityDataManager.defineId(MountEntity.class, DataSerializers.STRING);
+    public static final int maxHealth = 7;
 
-    public MountEntity(EntityType<? extends CowEntity> p_i48567_1_, World p_i48567_2_) {
+    private ItemStack summonStack;
+    private EntityType vanillaType;
+    public void setMountType(ItemStack stack){
+        this.summonStack = stack.copy();
+        this.vanillaType = MountSummonItem.getType(stack);
+        int texture = stack.getTag().getInt("texturetype");
+        this.setTextureType(texture);
+        int health = stack.getTag().getInt("health");
+        this.setHealth(health);
+        this.entityData.set(VANILLA_TYPE, EntityType.getKey(this.vanillaType).toString());
+    }
+
+    @Override
+    protected void dropCustomDeathLoot(DamageSource p_213333_1_, int p_213333_2_, boolean p_213333_3_) {
+        super.dropCustomDeathLoot(p_213333_1_, p_213333_2_, p_213333_3_);
+        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 1);
+        this.spawnAtLocation(summonStack);
+    }
+
+    public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+        if (this.isVehicle()) {
+            return super.mobInteract(player, hand);
+        }
+
+        ItemStack itemstack = player.getItemInHand(hand);
+        if (!itemstack.isEmpty()) {
+            boolean textureSuccess = false;
+            if (this.vanillaType == EntityType.SHEEP) textureSuccess = updateSheepTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.COW) textureSuccess = updateCowTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.PIG) textureSuccess = updatePigTexture(itemstack.getItem());
+            if (textureSuccess){
+                if (itemstack.getItem() != Items.SHEARS) itemstack.shrink(1);
+                return ActionResultType.CONSUME;
+            }
+
+            // eat food
+            Food food = itemstack.getItem().getFoodProperties();
+            if (food != null){
+                if (!level.isClientSide()){
+                    // regen
+                    int toHeal = Math.floorDiv(food.getNutrition(), 3);
+                    if (toHeal / 3 >= 1){
+                        this.heal(toHeal);
+                    }
+                    // effects
+                    food.getEffects().forEach((pair) -> {
+                        if (pair.getFirst() != null && random.nextFloat() < pair.getSecond()) this.addEffect(pair.getFirst());
+                    });
+                    // particles
+                    for(int i = 0; i < 10; ++i) {
+                        ((ServerWorld)level).sendParticles(ParticleTypes.HEART, getX() + (random.nextDouble() * 4 - 2), getY() + 1, getZ() + (random.nextDouble() * 4 - 2), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+                    }
+                }
+                // take
+                itemstack.shrink(1);
+                return ActionResultType.CONSUME;
+            }
+
+            ActionResultType actionresulttype = itemstack.interactLivingEntity(player, this, hand);
+            if (actionresulttype.consumesAction()) {
+                return actionresulttype;
+            }
+        }
+
+        this.doPlayerRide(player);
+        return ActionResultType.sidedSuccess(this.level.isClientSide);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(TEXTURE, 0);
+        this.entityData.define(VANILLA_TYPE, "");
+    }
+
+    public void setTextureType(int x){
+        this.entityData.set(TEXTURE, x);
+    }
+
+    public int getTextureType(){
+        return this.entityData.get(TEXTURE);
+    }
+
+    public EntityType getVanillaType() {
+        return EntityType.byString(this.entityData.get(VANILLA_TYPE)).orElse(EntityType.CREEPER);
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundNBT nbt) {
+        super.addAdditionalSaveData(nbt);
+        this.summonStack.getTag().putInt("health", (int) this.getHealth());
+        this.summonStack.getTag().putInt("texturetype", this.getTextureType());
+        nbt.put("summon", this.summonStack.getTag());
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundNBT nbt) {
+        super.readAdditionalSaveData(nbt);
+        ItemStack stack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
+        stack.setTag(nbt.getCompound("summon"));
+        this.setMountType(stack);
+    }
+
+    // *** TEXTURE TYPES BY ENTITY *** //
+
+    private static final Map<Item, DyeColor> woolBlocks = new HashMap<>();
+    static {
+        woolBlocks.put(Items.WHITE_WOOL, DyeColor.WHITE);
+        woolBlocks.put(Items.ORANGE_WOOL, DyeColor.ORANGE);
+        woolBlocks.put(Items.MAGENTA_WOOL, DyeColor.MAGENTA);
+        woolBlocks.put(Items.LIGHT_BLUE_WOOL, DyeColor.LIGHT_BLUE);
+        woolBlocks.put(Items.YELLOW_WOOL, DyeColor.YELLOW);
+        woolBlocks.put(Items.LIME_WOOL, DyeColor.LIME);
+        woolBlocks.put(Items.PINK_WOOL, DyeColor.PINK);
+        woolBlocks.put(Items.GRAY_WOOL, DyeColor.GRAY);
+        woolBlocks.put(Items.LIGHT_GRAY_WOOL, DyeColor.LIGHT_GRAY);
+        woolBlocks.put(Items.CYAN_WOOL, DyeColor.CYAN);
+        woolBlocks.put(Items.PURPLE_WOOL, DyeColor.PURPLE);
+        woolBlocks.put(Items.BLUE_WOOL, DyeColor.BLUE);
+        woolBlocks.put(Items.BROWN_WOOL, DyeColor.BROWN);
+        woolBlocks.put(Items.GREEN_WOOL, DyeColor.GREEN);
+        woolBlocks.put(Items.RED_WOOL, DyeColor.RED);
+        woolBlocks.put(Items.BLACK_WOOL, DyeColor.BLACK);
+    }
+
+    private boolean updateSheepTexture(Item item){
+        if (item instanceof DyeItem){
+            this.setTextureType(((DyeItem)item).getDyeColor().getId());
+        } else if (item == Items.SHEARS){
+            this.setTextureType(17);
+        } else if (item == Items.NETHER_STAR){
+            this.setTextureType(16);
+        } else if (woolBlocks.containsKey(item)) {
+            this.setTextureType(woolBlocks.get(item).getId());
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updateCowTexture(Item item){
+        if (item == Items.RED_MUSHROOM){
+            this.setTextureType(1);
+        } else if (item == Items.BROWN_MUSHROOM){
+            this.setTextureType(2);
+        } else if (item == Items.SHEARS){
+            this.setTextureType(0);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updatePigTexture(Item item){
+        if (item == Items.GLOWSTONE_DUST){
+            this.setTextureType(1);
+        } else if (item == Items.CARROT){
+            this.setTextureType(0);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    // *** HORSE *** //
+
+    public MountEntity(EntityType<? extends CreatureEntity> p_i48567_1_, World p_i48567_2_) {
         super(p_i48567_1_, p_i48567_2_);
         this.maxUpStep = 1;
     }
@@ -47,6 +221,7 @@ public class MountEntity extends CowEntity implements IJumpingMount{
     private float standAnimO;
     protected boolean canGallop = true;
     protected int gallopSoundCounter;
+    private boolean standing = true;
 
     public boolean isJumping() {
         return this.isJumping;
@@ -95,17 +270,7 @@ public class MountEntity extends CowEntity implements IJumpingMount{
     }
 
     public double getCustomJump() {
-        return 0.55D;// this.getAttributeValue(Attributes.JUMP_STRENGTH);
-    }
-
-    @Nullable
-    protected SoundEvent getEatingSound() {
-        return null;
-    }
-
-    @Nullable
-    protected SoundEvent getDeathSound() {
-        return null;
+        return 1.05D;// this.getAttributeValue(Attributes.JUMP_STRENGTH);
     }
 
     @Nullable
@@ -158,10 +323,6 @@ public class MountEntity extends CowEntity implements IJumpingMount{
 
     protected void playGallopSound(SoundType p_190680_1_) {
         this.playSound(SoundEvents.HORSE_GALLOP, p_190680_1_.getVolume() * 0.15F, p_190680_1_.getPitch());
-    }
-
-    public static AttributeModifierMap.MutableAttribute createBaseHorseAttributes() {
-        return MobEntity.createMobAttributes().add(Attributes.JUMP_STRENGTH).add(Attributes.MAX_HEALTH, 53.0D).add(Attributes.MOVEMENT_SPEED, (double)0.225F);
     }
 
     public int getMaxSpawnClusterSize() {
@@ -460,47 +621,5 @@ public class MountEntity extends CowEntity implements IJumpingMount{
             Vector3d vector3d3 = this.getDismountLocationInDirection(vector3d2, p_230268_1_);
             return vector3d3 != null ? vector3d3 : this.position();
         }
-    }
-
-
-    public ActionResultType mobInteract(PlayerEntity p_230254_1_, Hand p_230254_2_) {
-        if (this.isVehicle()) {
-            return super.mobInteract(p_230254_1_, p_230254_2_);
-        }
-
-        ItemStack itemstack = p_230254_1_.getItemInHand(p_230254_2_);
-        if (!itemstack.isEmpty()) {
-
-            // eat food
-            Food food = itemstack.getItem().getFoodProperties();
-            if (food != null){
-                if (!level.isClientSide()){
-                    // regen
-                    int toHeal = Math.floorDiv(food.getNutrition(), 3);
-                    if (toHeal / 3 >= 1){
-                        this.heal(toHeal);
-                    }
-                    // effects
-                    food.getEffects().forEach((pair) -> {
-                        if (pair.getFirst() != null && random.nextFloat() < pair.getSecond()) this.addEffect(pair.getFirst());
-                    });
-                    // particles
-                    for(int i = 0; i < 10; ++i) {
-                        ((ServerWorld)level).sendParticles(ParticleTypes.HEART, getX() + (random.nextDouble() * 4 - 2), getY() + 1, getZ() + (random.nextDouble() * 4 - 2), 1, 0.0D, 0.0D, 0.0D, 1.0D);
-                    }
-                }
-                // take
-                itemstack.shrink(1);
-                return ActionResultType.CONSUME;
-            }
-
-            ActionResultType actionresulttype = itemstack.interactLivingEntity(p_230254_1_, this, p_230254_2_);
-            if (actionresulttype.consumesAction()) {
-                return actionresulttype;
-            }
-        }
-
-        this.doPlayerRide(p_230254_1_);
-        return ActionResultType.sidedSuccess(this.level.isClientSide);
     }
 }

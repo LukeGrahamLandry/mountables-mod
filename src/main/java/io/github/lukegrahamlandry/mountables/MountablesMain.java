@@ -2,6 +2,7 @@ package io.github.lukegrahamlandry.mountables;
 
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
+import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -28,7 +29,7 @@ public class MountablesMain {
 
     public static void mobAttributes(EntityAttributeCreationEvent event){
         for (EntityType type : MountTypes.getMountTypes()){
-            event.put(MountTypes.get(type).getType(), MobEntity.createMobAttributes().add(Attributes.MAX_HEALTH, 20.0D).add(Attributes.MOVEMENT_SPEED, (double)0.23F).build());
+            event.put(MountTypes.get(type).getType(), MobEntity.createMobAttributes().add(Attributes.MAX_HEALTH, MountEntity.maxHealth).add(Attributes.MOVEMENT_SPEED, (double)0.23F).build());
         }
     }
 }
