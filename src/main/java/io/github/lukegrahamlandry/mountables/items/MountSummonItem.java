@@ -59,13 +59,14 @@ public class MountSummonItem extends Item {
         return EntityType.byString(typeName).orElse(null);
     }
 
-    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight){
+    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby){
         CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
         MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
         tag.putString("typeid", EntityType.getKey(type).toString());
         tag.putInt("texturetype", textureType);
         tag.putInt("health", health);
         tag.putBoolean("canfly", flight);
+        tag.putBoolean("baby", baby);
         stack.setTag(tag);
     }
 

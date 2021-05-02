@@ -21,6 +21,6 @@ public class CraftingHandler {
         MountablesMain.LOGGER.debug(recipeItem);
         EntityType type = MountTypes.getToCraft(recipeItem);
         MountablesMain.LOGGER.debug(type);
-        MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, false);
+        MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, false, false);
     }
 }
