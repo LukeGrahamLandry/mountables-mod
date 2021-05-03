@@ -87,6 +87,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (this.vanillaType == EntityType.SHEEP) textureSuccess = updateSheepTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.COW) textureSuccess = updateCowTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.PIG) textureSuccess = updatePigTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.SNOW_GOLEM) textureSuccess = updateSnowmanTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.SPIDER) textureSuccess = updateSpiderTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
@@ -110,7 +112,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 if (!level.isClientSide()){
                     // regen
                     int toHeal = Math.floorDiv(food.getNutrition(), 3);
-                    if (toHeal / 3 >= 1){
+                    if (toHeal >= 1){
                         this.heal(toHeal);
                     }
                     // effects
@@ -274,6 +276,28 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return true;
     }
 
+    private boolean updateSnowmanTexture(Item item){
+        if (item == Items.CARVED_PUMPKIN){
+            this.setTextureType(0);
+        } else if (item == Items.SHEARS){
+            this.setTextureType(1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updateSpiderTexture(Item item){
+        if (item == Items.STRING){
+            this.setTextureType(0);
+        } else if (item == Items.SPIDER_EYE){
+            this.setTextureType(1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     // *** HORSE *** //
 
     public MountEntity(EntityType<? extends CreatureEntity> p_i48567_1_, World p_i48567_2_) {
@@ -343,7 +367,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public double getCustomJump() {
-        return 1.05D;// this.getAttributeValue(Attributes.JUMP_STRENGTH);
+        return 0.85D;// this.getAttributeValue(Attributes.JUMP_STRENGTH);
     }
 
     @Nullable

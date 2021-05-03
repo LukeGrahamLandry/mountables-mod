@@ -2,14 +2,13 @@ package io.github.lukegrahamlandry.mountables.init;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.client.models.SheepMountModel;
+import io.github.lukegrahamlandry.mountables.client.models.WolfMountModel;
 import io.github.lukegrahamlandry.mountables.mounts.*;
-import net.minecraft.client.renderer.entity.model.CowModel;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.PigModel;
-import net.minecraft.client.renderer.entity.model.SheepModel;
+import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.util.ResourceLocation;
@@ -72,5 +71,10 @@ public class MountTypes {
         create(EntityType.SHEEP, Items.MUTTON, "textures/entity/sheep/sheep.png", SheepMountModel::new);
         create(EntityType.PIG, Items.PORKCHOP, "textures/entity/pig/pig.png", PigModel::new);
         create(EntityType.COW, Items.BEEF, "textures/entity/cow/cow.png", CowModel::new);
+        create(EntityType.SNOW_GOLEM, Items.SNOWBALL, "textures/entity/snow_golem.png", SnowManModel::new);
+        create(EntityType.CHICKEN, Items.CHICKEN, "textures/entity/chicken.png", ChickenModel::new);
+        create(EntityType.SPIDER, Items.STRING, "textures/entity/spider/spider.png", SpiderModel::new);
+        create(EntityType.CREEPER, Items.GUNPOWDER, "textures/entity/creeper/creeper.png", CreeperModel::new);
+        create(EntityType.WOLF, Items.BONE, "textures/entity/wolf/wolf.png", WolfMountModel::new);
     }
 }

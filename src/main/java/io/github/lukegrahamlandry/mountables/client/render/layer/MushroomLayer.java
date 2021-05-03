@@ -1,4 +1,4 @@
-package io.github.lukegrahamlandry.mountables.client.render;
+package io.github.lukegrahamlandry.mountables.client.render.layer;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
