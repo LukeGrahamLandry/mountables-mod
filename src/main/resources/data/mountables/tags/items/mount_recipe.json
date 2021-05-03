@@ -8,6 +8,9 @@
     "minecraft:chicken",
     "minecraft:string",
     "minecraft:gunpowder",
-    "minecraft:bone"
+    "minecraft:bone",
+    "minecraft:cod",
+    "minecraft:wheat",
+    "minecraft:sweet_berries"
   ]
 }

@@ -1,6 +1,7 @@
 package io.github.lukegrahamlandry.mountables.init;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
+import io.github.lukegrahamlandry.mountables.client.models.LlamaMountModel;
 import io.github.lukegrahamlandry.mountables.client.models.SheepMountModel;
 import io.github.lukegrahamlandry.mountables.client.models.WolfMountModel;
 import io.github.lukegrahamlandry.mountables.mounts.*;
@@ -8,6 +9,7 @@ import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.FoxEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -76,5 +78,8 @@ public class MountTypes {
         create(EntityType.SPIDER, Items.STRING, "textures/entity/spider/spider.png", SpiderModel::new);
         create(EntityType.CREEPER, Items.GUNPOWDER, "textures/entity/creeper/creeper.png", CreeperModel::new);
         create(EntityType.WOLF, Items.BONE, "textures/entity/wolf/wolf.png", WolfMountModel::new);
+        create(EntityType.CAT, Items.COD, "textures/entity/cat/ocelot.png", () -> new OcelotModel<MountEntity>(0.0F));
+        create(EntityType.LLAMA, Items.WHEAT, "textures/entity/llama/creamy.png", LlamaMountModel::new);
+        create(EntityType.FOX, Items.SWEET_BERRIES, "textures/entity/fox/fox.png", FoxModel::new);
     }
 }

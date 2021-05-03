@@ -1,6 +1,6 @@
 # Mountables Mod 
 
-A Minecraft mod for Forge 1.16.5 similar to Animal Bikes commissioned by The Ult1mate Guy
+A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The Ult1mate Guy
 
 ## Features
 - surround a mountable core with an item to get a certain mount summon item
@@ -18,3 +18,6 @@ A Minecraft mod for Forge 1.16.5 similar to Animal Bikes commissioned by The Ult
     - spider (string): spiders eye for cave spider, string to revert
     - creeper (gunpowder)
     - wolf (bone)
+    - cat (cod): cod cycles texture
+    - fox (sweet berry): snowball for arctic texture, spruce log to revert
+    - llama (wheat): wheat cycles texture

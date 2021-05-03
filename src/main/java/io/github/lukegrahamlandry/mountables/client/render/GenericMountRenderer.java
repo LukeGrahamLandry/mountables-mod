@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.model.CowModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.SnowManModel;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.function.Supplier;
@@ -34,10 +35,18 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (mount.getVanillaType() == EntityType.COW){
             if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/cow/red_mooshroom.png");
             if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/cow/brown_mooshroom.png");
-        } else if (mount.getVanillaType() == EntityType.PIG){
-            if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/nyan_pig.png");
-        } else if (mount.getVanillaType() == EntityType.SPIDER){
-            if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/spider/cave_spider.png");
+        } else if (mount.getVanillaType() == EntityType.PIG && mount.getTextureType() == 1){
+            return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/nyan_pig.png");
+        } else if (mount.getVanillaType() == EntityType.SPIDER && mount.getTextureType() == 1){
+            return new ResourceLocation("textures/entity/spider/cave_spider.png");
+        } else if (mount.getVanillaType() == EntityType.CAT && mount.getTextureType() >= 1){
+            return CatEntity.TEXTURE_BY_TYPE.get(mount.getTextureType() - 1);
+        } else if (mount.getVanillaType() == EntityType.LLAMA){
+            if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/llama/white.png");
+            if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/llama/brown.png");
+            if (mount.getTextureType() == 3) return new ResourceLocation("textures/entity/llama/gray.png");
+        } else if (mount.getVanillaType() == EntityType.FOX && mount.getTextureType() == 1) {
+            return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/fox/snow_fox.png");
         }
 
         return TEXTURE_LOCATION;

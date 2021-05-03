@@ -10,6 +10,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
@@ -89,6 +90,15 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (this.vanillaType == EntityType.PIG) textureSuccess = updatePigTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.SNOW_GOLEM) textureSuccess = updateSnowmanTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.SPIDER) textureSuccess = updateSpiderTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.CAT && itemstack.getItem() == Items.COD){
+                this.setTextureType((this.getTextureType() + 1) % (CatEntity.TEXTURE_BY_TYPE.size() + 1));
+                textureSuccess = true;
+            }
+            if (this.vanillaType == EntityType.CAT && itemstack.getItem() == Items.WHEAT){
+                this.setTextureType((this.getTextureType() + 1) % 4);
+                textureSuccess = true;
+            }
+            if (this.vanillaType == EntityType.FOX) textureSuccess = updateFoxTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
@@ -291,6 +301,17 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         if (item == Items.STRING){
             this.setTextureType(0);
         } else if (item == Items.SPIDER_EYE){
+            this.setTextureType(1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updateFoxTexture(Item item){
+        if (item == Items.SPRUCE_LOG){
+            this.setTextureType(0);
+        } else if (item == Items.SNOWBALL){
             this.setTextureType(1);
         } else {
             return false;
