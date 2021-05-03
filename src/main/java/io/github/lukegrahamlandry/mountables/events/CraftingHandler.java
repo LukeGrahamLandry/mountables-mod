@@ -21,6 +21,10 @@ public class CraftingHandler {
         MountablesMain.LOGGER.debug(recipeItem);
         EntityType type = MountTypes.getToCraft(recipeItem);
         MountablesMain.LOGGER.debug(type);
-        MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, false, false);
+        MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, canFlyByDefault(type), false);
+    }
+
+    private static boolean canFlyByDefault(EntityType type) {
+        return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM;
     }
 }

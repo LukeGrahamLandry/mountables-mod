@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.ParticleTypes;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.*;
@@ -80,10 +81,6 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
-        MountablesMain.LOGGER.debug(player.getUUID());
-        MountablesMain.LOGGER.debug(this.getOwnerUUID());
-        MountablesMain.LOGGER.debug(player.getUUID() == this.getOwnerUUID());
-
         if (this.isVehicle()) {
             return super.mobInteract(player, hand);
         }
@@ -114,6 +111,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 textureSuccess = true;
             }
             if (this.vanillaType == EntityType.ZOMBIE) textureSuccess = updateZombieTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.SKELETON) textureSuccess = updateSkeletonTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
@@ -121,6 +119,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (textureSuccess){
                 if (itemstack.getItem() != Items.SHEARS && itemstack.getItem() != Items.WATER_BUCKET) itemstack.shrink(1);
                 if (itemstack.getItem() == Items.WATER_BUCKET) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
                 return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
 
@@ -129,6 +128,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     || this.vanillaType == EntityType.WOLF || this.vanillaType == EntityType.FOX || this.vanillaType == EntityType.CAT
                         || this.vanillaType == EntityType.LLAMA || this.vanillaType == EntityType.PANDA || this.vanillaType == EntityType.ZOMBIE){
                     this.setChild(!this.isBaby());
+                    if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
                     player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                     return ActionResultType.sidedSuccess(this.level.isClientSide);
                 }
@@ -147,10 +147,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     food.getEffects().forEach((pair) -> {
                         if (pair.getFirst() != null && random.nextFloat() < pair.getSecond()) this.addEffect(pair.getFirst());
                     });
-                    // particles
-                    for(int i = 0; i < 10; ++i) {
-                        ((ServerWorld)level).sendParticles(ParticleTypes.HEART, getX() + (random.nextDouble() * 4 - 2), getY() + 1, getZ() + (random.nextDouble() * 4 - 2), 1, 0.0D, 0.0D, 0.0D, 1.0D);
-                    }
+
+                    doParticles(ParticleTypes.HEART);
                 }
                 // take
                 itemstack.shrink(1);
@@ -175,6 +173,14 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
         this.doPlayerRide(player);
         return ActionResultType.sidedSuccess(this.level.isClientSide);
+    }
+
+    private void doParticles(BasicParticleType particle) {
+        float width = this.getDimensions(this.getPose()).width;
+        double yShift = this.getDimensions(this.getPose()).height * random.nextDouble();
+        for(int i = 0; i < 7; ++i) {
+            ((ServerWorld)level).sendParticles(particle, getX() + (random.nextDouble() * (width * 2) - width), getY() + yShift, getZ() + (random.nextDouble() * (width * 2) - width), 1, 0.0D, 0.0D, 0.0D, 1.0D);
+        }
     }
 
     private boolean isOwner(PlayerEntity player) {
@@ -214,6 +220,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         super.addAdditionalSaveData(nbt);
         this.summonStack.getTag().putInt("health", (int) this.getHealth());
         this.summonStack.getTag().putInt("texturetype", this.getTextureType());
+        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby());
         nbt.put("summon", this.summonStack.getTag());
         nbt.putUUID("owner", getOwnerUUID());
     }
@@ -361,6 +368,18 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return true;
     }
 
+    private boolean updateSkeletonTexture(Item item){
+        if (item == Items.BONE){
+            this.setTextureType(0);
+        } else if (item == Items.COAL){
+            this.setTextureType(1);
+        } else if (item == Items.SNOWBALL){
+            this.setTextureType(2);
+        } else {
+            return false;
+        }
+        return true;
+    }
 
     // *** HORSE *** //
 
@@ -670,6 +689,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     } else {
                         d1 = d0;
                     }
+                    if (this.canFly()) d1 = 0.3;
 
                     Vector3d vector3d = this.getDeltaMovement();
                     this.setDeltaMovement(vector3d.x, d1, vector3d.z);
@@ -683,6 +703,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     }
 
                     this.playerJumpPendingScale = 0.0F;
+                    if (canFly()) isFlying = true;
                 }
 
                 this.flyingSpeed = this.getSpeed() * 0.1F;
@@ -700,7 +721,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
                 this.calculateEntityAnimation(this, false);
 
-                if (livingentity.xRot < -25 && livingentity.zza > 0) isFlying = true;  // flight logic?
+                // flight logic
+                if (livingentity.xRot < -25 && livingentity.zza > 0) isFlying = true;
             } else {
                 this.flyingSpeed = 0.02F;
                 super.travel(travelVec);
@@ -720,20 +742,17 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     @OnlyIn(Dist.CLIENT)
     public void onPlayerJump(int p_110206_1_) {
-        if (this.isSaddled()) {
-            if (p_110206_1_ < 0) {
-                p_110206_1_ = 0;
-            } else {
-                this.allowStandSliding = true;
-                this.stand();
-            }
+        if (p_110206_1_ < 0) {
+            p_110206_1_ = 0;
+        } else {
+            this.allowStandSliding = true;
+            this.stand();
+        }
 
-            if (p_110206_1_ >= 90) {
-                this.playerJumpPendingScale = 1.0F;
-            } else {
-                this.playerJumpPendingScale = 0.4F + 0.4F * (float)p_110206_1_ / 90.0F;
-            }
-
+        if (p_110206_1_ >= 90) {
+            this.playerJumpPendingScale = 1.0F;
+        } else {
+            this.playerJumpPendingScale = 0.4F + 0.4F * (float)p_110206_1_ / 90.0F;
         }
     }
 

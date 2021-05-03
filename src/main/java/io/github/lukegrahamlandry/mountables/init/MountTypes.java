@@ -82,7 +82,8 @@ public class MountTypes {
         create(EntityType.FOX, Items.SWEET_BERRIES, "textures/entity/fox/fox.png", FoxModel::new);
         create(EntityType.PANDA, Items.BAMBOO, "textures/entity/panda/panda.png", PandaMountModel::new);
         create(EntityType.ZOMBIE, Items.ROTTEN_FLESH, "textures/entity/zombie/zombie.png", ZombieMountModel::new);
-
-
+        create(EntityType.SKELETON, Items.BONE_MEAL, "textures/entity/skeleton/skeleton.png", SkeletonMountModel::new);
+        create(EntityType.PHANTOM, Items.PHANTOM_MEMBRANE, "textures/entity/phantom.png", PhantomModel::new);
+        create(EntityType.BEE, Items.HONEYCOMB, "textures/entity/bee/bee.png", BeeMountModel::new);
     }
 }

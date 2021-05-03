@@ -1,20 +1,22 @@
 package io.github.lukegrahamlandry.mountables.client.render;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.client.models.SheepMountModel;
+import io.github.lukegrahamlandry.mountables.client.models.SkeletonMountModel;
 import io.github.lukegrahamlandry.mountables.client.models.ZombieMountModel;
-import io.github.lukegrahamlandry.mountables.client.render.layer.DrownedLayer;
-import io.github.lukegrahamlandry.mountables.client.render.layer.MushroomLayer;
-import io.github.lukegrahamlandry.mountables.client.render.layer.PumpkinHeadLayer;
-import io.github.lukegrahamlandry.mountables.client.render.layer.WoolLayer;
+import io.github.lukegrahamlandry.mountables.client.render.layer.*;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.DrownedOuterLayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.layers.PhantomEyesLayer;
 import net.minecraft.client.renderer.entity.model.CowModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.PhantomModel;
 import net.minecraft.client.renderer.entity.model.SnowManModel;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
@@ -33,7 +35,14 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (vanillaType == EntityType.COW) this.addLayer((LayerRenderer<MountEntity, M>) new MushroomLayer((IEntityRenderer<MountEntity, CowModel<MountEntity>>) this));
         if (vanillaType == EntityType.SNOW_GOLEM) this.addLayer((LayerRenderer<MountEntity, M>) new PumpkinHeadLayer((IEntityRenderer<MountEntity, SnowManModel<MountEntity>>) this));
         if (vanillaType == EntityType.ZOMBIE) this.addLayer((LayerRenderer<MountEntity, M>) new DrownedLayer((IEntityRenderer<MountEntity, ZombieMountModel>) this));
-        // this.addLayer(new SaddleLayer<>(this, new PigModel<>(0.5F), new ResourceLocation("textures/entity/pig/pig_saddle.png")));
+        if (vanillaType == EntityType.SKELETON) this.addLayer((LayerRenderer<MountEntity, M>) new StrayLayer((IEntityRenderer<MountEntity, SkeletonMountModel>) this));
+        if (vanillaType == EntityType.PHANTOM) this.addLayer((LayerRenderer<MountEntity, M>) new PhantomEyesLayer<>((IEntityRenderer<MountEntity, PhantomModel<MountEntity>>) this));
+    }
+
+    @Override
+    public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
+        if (mount.getVanillaType() == EntityType.PHANTOM) matrixStack.translate(0, -1, 0);
+        super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
     }
 
     public ResourceLocation getTextureLocation(MountEntity mount) {
@@ -62,6 +71,9 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         } else if (mount.getVanillaType() == EntityType.ZOMBIE){
             if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/zombie/husk.png");
             if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/zombie/drowned.png");
+        } else if (mount.getVanillaType() == EntityType.SKELETON){
+            if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/skeleton/wither_skeleton.png");
+            if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/skeleton/stray.png");
         }
 
         return TEXTURE_LOCATION;

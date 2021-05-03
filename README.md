@@ -20,6 +20,9 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - wolf (bone)
     - cat (cod): cod cycles texture
     - fox (sweet berry): snowball for arctic texture, spruce log to revert
+    - bee (honey comb)
     - llama (wheat): wheat cycles texture
     - panda (bamboo): bamboo cycles textures
     - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh for normal
+    - skeleton (bone meal): coal for wither, snow ball for stray, bone for normal
+    - phantom (phantom membrane)
