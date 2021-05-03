@@ -35,6 +35,7 @@ import net.minecraftforge.common.ForgeHooks;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MountEntity extends CreatureEntity implements IJumpingMount{
@@ -42,6 +43,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<String> VANILLA_TYPE = EntityDataManager.defineId(MountEntity.class, DataSerializers.STRING);
     private static final DataParameter<Boolean> CAN_FLY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_BABY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.defineId(MountEntity.class, DataSerializers.OPTIONAL_UUID);
     public static final int maxHealth = 7;
 
     private ItemStack summonStack;
@@ -78,6 +80,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public ActionResultType mobInteract(PlayerEntity player, Hand hand) {
+        MountablesMain.LOGGER.debug(player.getUUID());
+        MountablesMain.LOGGER.debug(this.getOwnerUUID());
+        MountablesMain.LOGGER.debug(player.getUUID() == this.getOwnerUUID());
+
         if (this.isVehicle()) {
             return super.mobInteract(player, hand);
         }
@@ -99,17 +105,29 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 textureSuccess = true;
             }
             if (this.vanillaType == EntityType.FOX) textureSuccess = updateFoxTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.LLAMA && itemstack.getItem() == Items.WHEAT){
+                this.setTextureType((this.getTextureType() + 1) % 4);
+                textureSuccess = true;
+            }
+            if (this.vanillaType == EntityType.PANDA && itemstack.getItem() == Items.BAMBOO){
+                this.setTextureType((this.getTextureType() + 1) % 7);
+                textureSuccess = true;
+            }
+            if (this.vanillaType == EntityType.ZOMBIE) textureSuccess = updateZombieTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
             }
             if (textureSuccess){
-                if (itemstack.getItem() != Items.SHEARS) itemstack.shrink(1);
+                if (itemstack.getItem() != Items.SHEARS && itemstack.getItem() != Items.WATER_BUCKET) itemstack.shrink(1);
+                if (itemstack.getItem() == Items.WATER_BUCKET) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                 return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
 
             if (itemstack.getItem() == Items.MILK_BUCKET){
-                if (this.vanillaType == EntityType.COW || this.vanillaType == EntityType.PIG || this.vanillaType == EntityType.SHEEP){
+                if (this.vanillaType == EntityType.COW || this.vanillaType == EntityType.PIG || this.vanillaType == EntityType.SHEEP
+                    || this.vanillaType == EntityType.WOLF || this.vanillaType == EntityType.FOX || this.vanillaType == EntityType.CAT
+                        || this.vanillaType == EntityType.LLAMA || this.vanillaType == EntityType.PANDA || this.vanillaType == EntityType.ZOMBIE){
                     this.setChild(!this.isBaby());
                     player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                     return ActionResultType.sidedSuccess(this.level.isClientSide);
@@ -145,15 +163,22 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             }
         }
 
-        if (player.isShiftKeyDown() && player.getUUID() == this.owner && player.getItemInHand(hand).isEmpty() && hand == Hand.MAIN_HAND){
-            MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby());
-            player.setItemInHand(hand, this.summonStack);
+        if (player.isShiftKeyDown() && isOwner(player) && player.getItemInHand(hand).isEmpty() && hand == Hand.MAIN_HAND){
+            if (!level.isClientSide()){
+                // crashes on client if leaded from nbt because stack is null
+                MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby());
+                player.setItemInHand(hand, this.summonStack);
+            }
             this.remove();
             return ActionResultType.SUCCESS;
         }
 
         this.doPlayerRide(player);
         return ActionResultType.sidedSuccess(this.level.isClientSide);
+    }
+
+    private boolean isOwner(PlayerEntity player) {
+        return this.getOwnerUUID() != null && player.getUUID().toString().equals(this.getOwnerUUID().toString());
     }
 
     @Override
@@ -169,6 +194,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.entityData.define(VANILLA_TYPE, "");
         this.entityData.define(CAN_FLY, false);
         this.entityData.define(IS_BABY, false);
+        this.entityData.define(OWNER, Optional.empty());
     }
 
     public void setTextureType(int x){
@@ -189,7 +215,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.summonStack.getTag().putInt("health", (int) this.getHealth());
         this.summonStack.getTag().putInt("texturetype", this.getTextureType());
         nbt.put("summon", this.summonStack.getTag());
-        nbt.putUUID("owner", this.owner);
+        nbt.putUUID("owner", getOwnerUUID());
     }
 
     @Override
@@ -198,22 +224,25 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         ItemStack stack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
         stack.setTag(nbt.getCompound("summon"));
         this.setMountType(stack);
-        this.owner = nbt.getUUID("owner");
-        MountablesMain.LOGGER.debug(this.owner);
+        this.setOwnerUUID(nbt.getUUID("owner"));
     }
 
     private boolean canFly() {
         return this.entityData.get(CAN_FLY);
     }
 
-    private UUID owner;
-
-    public void setOwner(Entity entity) {
-        this.owner = entity.getUUID();
+    public void setOwnerUUID(UUID id) {
+        this.entityData.set(OWNER, Optional.of(id));
     }
 
     public LivingEntity getOwner() {
-        return (LivingEntity) ((ServerWorld)level).getEntity(this.owner);
+       if (getOwnerUUID() == null) return null;
+       return (LivingEntity) ((ServerWorld)level).getEntity(getOwnerUUID());
+    }
+
+    public UUID getOwnerUUID() {
+        if (!this.entityData.get(OWNER).isPresent()) return null;
+        return this.entityData.get(OWNER).get();
     }
 
     @Override
@@ -318,6 +347,20 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         }
         return true;
     }
+
+    private boolean updateZombieTexture(Item item){
+        if (item == Items.ROTTEN_FLESH){
+            this.setTextureType(0);
+        } else if (item == Items.SAND){
+            this.setTextureType(1);
+        } else if (item == Items.WATER_BUCKET){
+            this.setTextureType(2);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
 
     // *** HORSE *** //
 
@@ -461,7 +504,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     protected void doPlayerRide(PlayerEntity player) {
         this.setStanding(false);
-        if (!this.level.isClientSide && player.getUUID() == this.owner) {
+        if (!this.level.isClientSide && isOwner(player)) {
             player.yRot = this.yRot;
             player.xRot = this.xRot;
             player.startRiding(this);

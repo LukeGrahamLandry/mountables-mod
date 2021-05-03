@@ -5,7 +5,7 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
 ## Features
 - surround a mountable core with an item to get a certain mount summon item
 - right click item to summon
-- owner can shift right click to retrieve mount or summon item is dropped on death
+- owner can shift right click with empty hand to retrieve mount or summon item is dropped on death
 - change texture of some mounts by using certain items on them
 - use a feather to grant flight, food to heal
 - mounts with a baby version can be toggled with milk
@@ -21,3 +21,5 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - cat (cod): cod cycles texture
     - fox (sweet berry): snowball for arctic texture, spruce log to revert
     - llama (wheat): wheat cycles texture
+    - panda (bamboo): bamboo cycles textures
+    - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh for normal

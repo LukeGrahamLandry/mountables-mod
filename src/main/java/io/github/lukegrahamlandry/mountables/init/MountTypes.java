@@ -1,15 +1,14 @@
 package io.github.lukegrahamlandry.mountables.init;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
-import io.github.lukegrahamlandry.mountables.client.models.LlamaMountModel;
-import io.github.lukegrahamlandry.mountables.client.models.SheepMountModel;
-import io.github.lukegrahamlandry.mountables.client.models.WolfMountModel;
+import io.github.lukegrahamlandry.mountables.client.models.*;
 import io.github.lukegrahamlandry.mountables.mounts.*;
 import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.FoxEntity;
+import net.minecraft.entity.passive.PandaEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
@@ -81,5 +80,9 @@ public class MountTypes {
         create(EntityType.CAT, Items.COD, "textures/entity/cat/ocelot.png", () -> new OcelotModel<MountEntity>(0.0F));
         create(EntityType.LLAMA, Items.WHEAT, "textures/entity/llama/creamy.png", LlamaMountModel::new);
         create(EntityType.FOX, Items.SWEET_BERRIES, "textures/entity/fox/fox.png", FoxModel::new);
+        create(EntityType.PANDA, Items.BAMBOO, "textures/entity/panda/panda.png", PandaMountModel::new);
+        create(EntityType.ZOMBIE, Items.ROTTEN_FLESH, "textures/entity/zombie/zombie.png", ZombieMountModel::new);
+
+
     }
 }

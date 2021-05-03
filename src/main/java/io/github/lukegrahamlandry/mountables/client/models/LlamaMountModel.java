@@ -71,9 +71,9 @@ public class LlamaMountModel extends EntityModel<MountEntity> {
         this.leg1.xRot = MathHelper.cos(p_225597_2_ * 0.6662F + (float)Math.PI) * 1.4F * p_225597_3_;
         this.leg2.xRot = MathHelper.cos(p_225597_2_ * 0.6662F + (float)Math.PI) * 1.4F * p_225597_3_;
         this.leg3.xRot = MathHelper.cos(p_225597_2_ * 0.6662F) * 1.4F * p_225597_3_;
-        boolean flag = !p_225597_1_.isBaby();  //  && p_225597_1_.hasChest();
-        this.chest1.visible = flag;
-        this.chest2.visible = flag;
+        // boolean flag = !p_225597_1_.isBaby() && p_225597_1_.hasChest();
+        this.chest1.visible = false;
+        this.chest2.visible = false;
     }
 
     public void renderToBuffer(MatrixStack p_225598_1_, IVertexBuilder p_225598_2_, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_) {

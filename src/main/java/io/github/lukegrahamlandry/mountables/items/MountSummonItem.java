@@ -103,7 +103,7 @@ public class MountSummonItem extends Item {
             Entity summon = entitytype.spawn((ServerWorld)world, itemstack, context.getPlayer(), blockpos1, SpawnReason.SPAWN_EGG, true, !Objects.equals(blockpos, blockpos1) && direction == Direction.UP);
             if (summon != null) {
                 ((MountEntity)summon).setMountType(itemstack);
-                ((MountEntity)summon).setOwner(context.getPlayer());
+                ((MountEntity)summon).setOwnerUUID(context.getPlayer().getUUID());
                 itemstack.shrink(1);
             }
 
