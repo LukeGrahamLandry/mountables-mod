@@ -26,3 +26,7 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh for normal
     - skeleton (bone meal): coal for wither, snow ball for stray, bone for normal
     - phantom (phantom membrane)
+    
+## Support the Developer
+- https://patreon.com/LukeGrahamLandry
+- DM LukeGrahamLandry#6888 on discord for mod commissions

@@ -32,16 +32,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class MountSummonItem extends Item {
-    static HashMap<EntityType, SpawnEggItem> eggs = new HashMap<>();
+    public static HashMap<EntityType, SpawnEggItem> eggs = new HashMap<>();
     public MountSummonItem(Item.Properties props) {
         super(props);
-
-        // do this in common setup event? need to wait until all items registered if i want mod compatibility
-        ForgeRegistries.ITEMS.getValues().forEach((item) -> {
-            if (item instanceof SpawnEggItem){
-                eggs.put(((SpawnEggItem)item).getType(null), ((SpawnEggItem)item));
-            }
-        });
     }
 
     @Override
@@ -61,7 +54,7 @@ public class MountSummonItem extends Item {
 
     public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby){
         CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
-        MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
+        // MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
         tag.putString("typeid", EntityType.getKey(type).toString());
         tag.putInt("texturetype", textureType);
         tag.putInt("health", health);

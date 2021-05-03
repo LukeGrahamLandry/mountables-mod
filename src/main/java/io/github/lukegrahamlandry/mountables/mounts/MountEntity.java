@@ -579,16 +579,18 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         if (this.isStanding()) {
             this.eatAnim = 0.0F;
             this.eatAnimO = this.eatAnim;
-            this.standAnim += (1.0F - this.standAnim) * 0.4F + 0.05F;
-            if (this.standAnim > 1.0F) {
-                this.standAnim = 1.0F;
-            }
+            
+            // this was for shift forwards when you jump
+            //this.standAnim += (1.0F - this.standAnim) * 0.4F + 0.05F;
+            //if (this.standAnim > 1.0F) {
+            //    this.standAnim = 1.0F;
+            //}
         } else {
             this.allowStandSliding = false;
-            this.standAnim += (0.8F * this.standAnim * this.standAnim * this.standAnim - this.standAnim) * 0.6F - 0.05F;
-            if (this.standAnim < 0.0F) {
-                this.standAnim = 0.0F;
-            }
+            //this.standAnim += (0.8F * this.standAnim * this.standAnim * this.standAnim - this.standAnim) * 0.6F - 0.05F;
+            //if (this.standAnim < 0.0F) {
+             //   this.standAnim = 0.0F;
+            //}
         }
     }
 
@@ -777,6 +779,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             this.yBodyRot = mobentity.yBodyRot;
         }
 
+        /*  // shift forwards when you jump
         if (this.standAnimO > 0.0F) {
             float f3 = MathHelper.sin(this.yBodyRot * ((float)Math.PI / 180F));
             float f = MathHelper.cos(this.yBodyRot * ((float)Math.PI / 180F));
@@ -787,6 +790,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 ((LivingEntity)p_184232_1_).yBodyRot = this.yBodyRot;
             }
         }
+
+         */
 
     }
 
