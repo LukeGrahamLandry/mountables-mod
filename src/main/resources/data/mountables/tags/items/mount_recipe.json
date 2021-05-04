@@ -16,6 +16,10 @@
     "minecraft:rotten_flesh",
     "minecraft:bone_meal",
     "minecraft:phantom_membrane",
-    "minecraft:honeycomb"
+    "minecraft:honeycomb",
+    "minecraft:soul_sand",
+    "minecraft:ghast_tear",
+    "minecraft:cooked_porkchop",
+    "minecraft:leather"
   ]
 }

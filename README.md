@@ -17,14 +17,18 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - chicken (chicken)
     - spider (string): spiders eye for cave spider, string to revert
     - creeper (gunpowder)
+    - ghast (ghast tear)
     - wolf (bone)
     - cat (cod): cod cycles texture
     - fox (sweet berry): snowball for arctic texture, spruce log to revert
+    - wither (soul sand)
     - bee (honey comb)
     - llama (wheat): wheat cycles texture
     - panda (bamboo): bamboo cycles textures
     - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh for normal
     - skeleton (bone meal): coal for wither, snow ball for stray, bone for normal
+    - ravager (leather)
+    - hoglin (cooked pork): rotten flesh for zoglin, pork to revert
     - phantom (phantom membrane)
     
 ## Support the Developer

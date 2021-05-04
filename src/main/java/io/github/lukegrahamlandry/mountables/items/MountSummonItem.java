@@ -64,7 +64,7 @@ public class MountSummonItem extends Item {
     }
 
     public static int getItemColor(ItemStack stack, int tintIndex){
-        if (getType(stack) == null) return tintIndex == 0 ? 0XFFFFFF : 0;
+        if (getType(stack) == null) return 0XFFFFFF;  // tintIndex == 0 ? 0XFFFFFF : 0;
         SpawnEggItem egg = eggs.get(getType(stack));
         if (tintIndex == 0 || egg == null){
             return 0XFFFFFF;

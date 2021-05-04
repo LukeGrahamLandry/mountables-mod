@@ -85,5 +85,9 @@ public class MountTypes {
         create(EntityType.SKELETON, Items.BONE_MEAL, "textures/entity/skeleton/skeleton.png", SkeletonMountModel::new);
         create(EntityType.PHANTOM, Items.PHANTOM_MEMBRANE, "textures/entity/phantom.png", PhantomModel::new);
         create(EntityType.BEE, Items.HONEYCOMB, "textures/entity/bee/bee.png", BeeMountModel::new);
+        create(EntityType.GHAST, Items.GHAST_TEAR, "textures/entity/ghast/ghast.png", GhastModel::new);
+        create(EntityType.WITHER, Items.SOUL_SAND, "textures/entity/wither/wither.png", WitherMountModel::new);
+        create(EntityType.HOGLIN, Items.COOKED_PORKCHOP, "textures/entity/hoglin/hoglin.png", HogMountModel::new);
+        create(EntityType.RAVAGER, Items.LEATHER, "textures/entity/illager/ravager.png", RavagerMountModel::new);
     }
 }

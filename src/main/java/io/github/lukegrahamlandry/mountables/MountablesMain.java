@@ -9,6 +9,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.passive.SheepEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.item.SpawnEggItem;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
@@ -47,5 +48,6 @@ public class MountablesMain {
                 MountSummonItem.eggs.put(((SpawnEggItem)item).getType(null), ((SpawnEggItem)item));
             }
         });
+        MountSummonItem.eggs.put(EntityType.WITHER, (SpawnEggItem) Items.WITHER_SKELETON_SPAWN_EGG);
     }
 }

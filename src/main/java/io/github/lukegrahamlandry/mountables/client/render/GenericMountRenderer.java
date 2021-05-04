@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.PhantomModel;
 import net.minecraft.client.renderer.entity.model.SnowManModel;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.PandaEntity;
 import net.minecraft.util.ResourceLocation;
@@ -43,6 +44,12 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
         if (mount.getVanillaType() == EntityType.PHANTOM) matrixStack.translate(0, -1, 0);
         super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
+    }
+
+    @Override
+    protected void scale(MountEntity mount, MatrixStack p_225620_2_, float p_225620_3_) {
+        if (mount.getVanillaType() == EntityType.GHAST && !mount.isBaby()) p_225620_2_.scale(4.5F, 4.5F, 4.5F);
+        if (mount.getVanillaType() == EntityType.WITHER && !mount.isBaby()) p_225620_2_.scale(2,2,2);
     }
 
     public ResourceLocation getTextureLocation(MountEntity mount) {
@@ -74,7 +81,11 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         } else if (mount.getVanillaType() == EntityType.SKELETON){
             if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/skeleton/wither_skeleton.png");
             if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/skeleton/stray.png");
+        } else if (mount.getVanillaType() == EntityType.HOGLIN && mount.getTextureType() == 1){
+            return new ResourceLocation("textures/entity/hoglin/zoglin.png");
         }
+
+
 
         return TEXTURE_LOCATION;
     }

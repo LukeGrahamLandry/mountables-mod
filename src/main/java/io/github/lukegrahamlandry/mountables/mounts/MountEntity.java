@@ -112,26 +112,23 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             }
             if (this.vanillaType == EntityType.ZOMBIE) textureSuccess = updateZombieTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.SKELETON) textureSuccess = updateSkeletonTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.HOGLIN) textureSuccess = updateHogTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
             }
             if (textureSuccess){
-                if (itemstack.getItem() != Items.SHEARS && itemstack.getItem() != Items.WATER_BUCKET) itemstack.shrink(1);
                 if (itemstack.getItem() == Items.WATER_BUCKET) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                else if (itemstack.getItem() != Items.SHEARS) itemstack.shrink(1);
                 if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
                 return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
 
-            if (itemstack.getItem() == Items.MILK_BUCKET){
-                if (this.vanillaType == EntityType.COW || this.vanillaType == EntityType.PIG || this.vanillaType == EntityType.SHEEP
-                    || this.vanillaType == EntityType.WOLF || this.vanillaType == EntityType.FOX || this.vanillaType == EntityType.CAT
-                        || this.vanillaType == EntityType.LLAMA || this.vanillaType == EntityType.PANDA || this.vanillaType == EntityType.ZOMBIE){
-                    this.setChild(!this.isBaby());
-                    if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
-                    player.setItemInHand(hand, new ItemStack(Items.BUCKET));
-                    return ActionResultType.sidedSuccess(this.level.isClientSide);
-                }
+            if (itemstack.getItem() == Items.MILK_BUCKET && allowBaby()){
+                this.setChild(!this.isBaby());
+                if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
+                player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
 
             // eat food
@@ -173,6 +170,13 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
         this.doPlayerRide(player);
         return ActionResultType.sidedSuccess(this.level.isClientSide);
+    }
+
+    private boolean allowBaby() {
+        return this.vanillaType == EntityType.COW || this.vanillaType == EntityType.PIG || this.vanillaType == EntityType.SHEEP
+                || this.vanillaType == EntityType.WOLF || this.vanillaType == EntityType.FOX || this.vanillaType == EntityType.CAT
+                || this.vanillaType == EntityType.LLAMA || this.vanillaType == EntityType.PANDA || this.vanillaType == EntityType.ZOMBIE
+                || this.vanillaType == EntityType.WITHER || this.vanillaType == EntityType.GHAST || this.vanillaType == EntityType.HOGLIN;
     }
 
     private void doParticles(BasicParticleType particle) {
@@ -375,6 +379,17 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             this.setTextureType(1);
         } else if (item == Items.SNOWBALL){
             this.setTextureType(2);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updateHogTexture(Item item){
+        if (item == Items.PORKCHOP){
+            this.setTextureType(0);
+        } else if (item == Items.ROTTEN_FLESH){
+            this.setTextureType(1);
         } else {
             return false;
         }
@@ -797,7 +812,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     @Override
     public double getPassengersRidingOffset() {
-        return (double)this.getDimensions(getPose()).height * 0.75D;
+        double scale = 0.75D;
+        if (!this.isBaby() && (this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.WITHER || this.getVanillaType() == EntityType.RAVAGER || this.getVanillaType() == EntityType.HOGLIN)) scale = 1;
+        return (double)this.getDimensions(getPose()).height * scale;
     }
 
     protected float generateRandomMaxHealth() {
@@ -817,7 +834,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public float getScale() {
-        return this.isBaby() ? 0.5F : 1.0F;
+        return this.isBaby() ? (this.getVanillaType() == EntityType.GHAST ? 0.25F : 0.5F) : 1.0F;
     }
 
     protected float getStandingEyeHeight(Pose p_213348_1_, EntitySize p_213348_2_) {
