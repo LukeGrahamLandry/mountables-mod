@@ -28,7 +28,7 @@ public class MountTypes {
     private static final Map<EntityType<? extends LivingEntity>, MountTypeData> mountLookup = new HashMap<>();
     private static final Map<Item, EntityType<? extends LivingEntity>> mountRecipeLookup = new HashMap<>();
 
-    public static MountTypeData get(EntityType<MountEntity> type) {
+    public static MountTypeData get(EntityType type) {
         return mountLookup.get(type);
     }
     public static EntityType<?> getToCraft(Item item) {
@@ -92,5 +92,7 @@ public class MountTypes {
         create(EntityType.TURTLE, Items.SCUTE, "textures/entity/turtle/big_sea_turtle.png", TurtleMountModel::new);
         create(EntityType.SQUID, Items.INK_SAC, "textures/entity/squid.png", SquidModel::new);
         create(EntityType.GUARDIAN, Items.PRISMARINE_SHARD, "textures/entity/guardian.png", GuardianMountModel::new);
+        create(EntityType.SLIME, Items.SLIME_BALL,  "textures/entity/slime/slime.png", () -> new SlimeModel<MountEntity>(16));
+        create(EntityType.MAGMA_CUBE, Items.BEDROCK,  "textures/entity/slime/magmacube.png", MagmaMountModel::new);
     }
 }

@@ -2,6 +2,7 @@ package io.github.lukegrahamlandry.mountables.mounts;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
+import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -115,6 +116,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (this.vanillaType == EntityType.HOGLIN) textureSuccess = updateHogTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.SQUID) textureSuccess = updateSquidTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.GUARDIAN) textureSuccess = updateGuardianTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.SLIME) textureSuccess = updateSlimeTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
@@ -179,7 +181,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 || this.vanillaType == EntityType.WOLF || this.vanillaType == EntityType.FOX || this.vanillaType == EntityType.CAT
                 || this.vanillaType == EntityType.LLAMA || this.vanillaType == EntityType.PANDA || this.vanillaType == EntityType.ZOMBIE
                 || this.vanillaType == EntityType.WITHER || this.vanillaType == EntityType.GHAST || this.vanillaType == EntityType.HOGLIN
-                || this.vanillaType == EntityType.TURTLE || this.vanillaType == EntityType.CHICKEN;
+                || this.vanillaType == EntityType.TURTLE || this.vanillaType == EntityType.CHICKEN || this.vanillaType == EntityType.SLIME;
     }
 
     private void doParticles(BasicParticleType particle) {
@@ -431,6 +433,21 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return true;
     }
 
+    private boolean updateSlimeTexture(Item item){
+        if (item == Items.SLIME_BALL){
+            this.setTextureType(0);
+        } else if (item == Items.MAGMA_CREAM){
+            this.setTextureType(1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    public EntityType<?> getType() {
+        return (this.getVanillaType() == EntityType.SLIME && this.getTextureType() == 1) ? MountTypes.get(EntityType.MAGMA_CUBE).getType() : super.getType();
+    }
+
     // *** HORSE *** //
 
     public MountEntity(EntityType<? extends CreatureEntity> p_i48567_1_, World p_i48567_2_) {
@@ -480,7 +497,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         }
 
         int i = this.calculateFallDamage(p_225503_1_, p_225503_2_);
-        if (i <= 0 || this.canFly()) {
+        if (i <= 0 || this.canFly() || this.getVanillaType() == EntityType.SLIME) {
             return false;
         } else {
             this.hurt(DamageSource.FALL, (float)i);
@@ -500,7 +517,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public double getCustomJump() {
-        return 0.85D;// this.getAttributeValue(Attributes.JUMP_STRENGTH);
+        return 0.65D;// this.getAttributeValue(Attributes.JUMP_STRENGTH);
     }
 
     @Nullable
@@ -666,7 +683,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     final double flightSpeed = 0.25D;
     public void travel(Vector3d travelVec) {
         if (this.isAlive()) {
-            if (this.isVehicle() && (this.canFly() || this.canBeRiddenInWater(null))){
+            if (this.isVehicle() && (this.canFly() || this.canBeRiddenInWater(null)) && !(this.getVanillaType() == EntityType.SLIME)){
                 LivingEntity rider = (LivingEntity) this.getPassengers().get(0);
 
                 if (this.canBeRiddenInWater(rider) && this.isInWaterOrBubble()){
@@ -745,7 +762,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     f1 = 0.0F;
                 }
 
-                if (this.playerJumpPendingScale > 0.0F && !this.isJumping() && this.onGround) {
+                boolean allowJump = (this.onGround && !this.isJumping()) || (this.getVanillaType() == EntityType.SLIME && canFly());
+                if (this.playerJumpPendingScale > 0.0F && allowJump) {
                     double d0 = this.getCustomJump() * (double)this.playerJumpPendingScale * (double)this.getBlockJumpFactor();
                     double d1;
                     if (this.hasEffect(Effects.JUMP)) {
@@ -753,7 +771,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     } else {
                         d1 = d0;
                     }
-                    if (this.canFly()) d1 = 0.3;
+                    if (this.canFly()) d1 = 0.5;
+                    if (this.getVanillaType() == EntityType.SLIME) d1 *= 1.75;
 
                     Vector3d vector3d = this.getDeltaMovement();
                     this.setDeltaMovement(vector3d.x, d1, vector3d.z);
@@ -863,7 +882,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Override
     public double getPassengersRidingOffset() {
         double scale = 0.75D;
-        if (!this.isBaby() && (this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.WITHER || this.getVanillaType() == EntityType.RAVAGER || this.getVanillaType() == EntityType.HOGLIN)) scale = 1;
+        if (!this.isBaby() && (this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.WITHER || this.getVanillaType() == EntityType.RAVAGER || this.getVanillaType() == EntityType.HOGLIN || this.getVanillaType() == EntityType.SLIME)) scale = 1;
         return (double)this.getDimensions(getPose()).height * scale;
     }
 
@@ -884,7 +903,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public float getScale() {
-        return this.isBaby() ? (this.getVanillaType() == EntityType.GHAST ? 0.25F : 0.5F) : 1.0F;
+        boolean smolBaby = this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.SLIME;
+        return this.isBaby() ? (smolBaby ? 0.2F : 0.5F) : 1.0F;
     }
 
     protected float getStandingEyeHeight(Pose p_213348_1_, EntitySize p_213348_2_) {

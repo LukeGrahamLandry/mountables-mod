@@ -14,10 +14,8 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.DrownedOuterLayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.layers.PhantomEyesLayer;
-import net.minecraft.client.renderer.entity.model.CowModel;
-import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.PhantomModel;
-import net.minecraft.client.renderer.entity.model.SnowManModel;
+import net.minecraft.client.renderer.entity.layers.SlimeGelLayer;
+import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.passive.CatEntity;
@@ -40,6 +38,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (vanillaType == EntityType.ZOMBIE) this.addLayer((LayerRenderer<MountEntity, M>) new DrownedLayer((IEntityRenderer<MountEntity, ZombieMountModel>) this));
         if (vanillaType == EntityType.SKELETON) this.addLayer((LayerRenderer<MountEntity, M>) new StrayLayer((IEntityRenderer<MountEntity, SkeletonMountModel>) this));
         if (vanillaType == EntityType.PHANTOM) this.addLayer((LayerRenderer<MountEntity, M>) new PhantomEyesLayer<>((IEntityRenderer<MountEntity, PhantomModel<MountEntity>>) this));
+        if (vanillaType == EntityType.SLIME) this.addLayer((LayerRenderer<MountEntity, M>) new SlimeGelLayer(this));
     }
 
     @Override
@@ -53,6 +52,14 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     protected void scale(MountEntity mount, MatrixStack p_225620_2_, float p_225620_3_) {
         if (mount.getVanillaType() == EntityType.GHAST && !mount.isBaby()) p_225620_2_.scale(4.5F, 4.5F, 4.5F);
         if (mount.getVanillaType() == EntityType.WITHER && !mount.isBaby()) p_225620_2_.scale(2,2,2);
+        if (mount.getVanillaType() == EntityType.SLIME || mount.getVanillaType() == EntityType.MAGMA_CUBE){
+            float size = mount.isBaby() ? 1 : 4;
+            p_225620_2_.scale(0.999F, 0.999F, 0.999F);
+            p_225620_2_.translate(0.0D, (double)0.001F, 0.0D);
+            float f2 = 0; // MathHelper.lerp(p_225620_3_, mount.oSquish, mount.squish) / (f1 * 0.5F + 1.0F);
+            float f3 = 1.0F / (f2 + 1.0F);
+            p_225620_2_.scale(f3 * size, 1.0F / f3 * size, f3 * size);
+        }
     }
 
     @Override
@@ -95,9 +102,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/glow_squid.png");
         } else if (mount.getVanillaType() == EntityType.GUARDIAN && mount.getTextureType() == 1){
             return new ResourceLocation("textures/entity/guardian_elder.png");
-        }
-
-
+        } 
 
         return TEXTURE_LOCATION;
     }

@@ -7,7 +7,7 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
 - right click item to summon
 - owner can shift right click with empty hand to retrieve mount or summon item is dropped on death
 - change texture of some mounts by using certain items on them
-- use a feather to grant flight, food to heal
+- use a feather to grant flight (slimes get multi-jump instead), food to heal
 - mounts with a baby version can be toggled with milk
 - some mounts can swim but are slow on land
 - **Types**
@@ -18,6 +18,7 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - chicken (chicken)
     - spider (string): spiders eye for cave spider, string to revert
     - creeper (gunpowder)
+    - slime (slime ball): magma cream for magma cube texture, slime ball reverts it
     - ghast (ghast tear)
     - wolf (bone)
     - cat (cod): cod cycles texture
