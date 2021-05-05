@@ -20,6 +20,9 @@
     "minecraft:soul_sand",
     "minecraft:ghast_tear",
     "minecraft:cooked_porkchop",
-    "minecraft:leather"
+    "minecraft:leather",
+    "minecraft:scute",
+    "minecraft:ink_sac",
+    "minecraft:prismarine_shard"
   ]
 }

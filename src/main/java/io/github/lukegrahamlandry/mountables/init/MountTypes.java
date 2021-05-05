@@ -89,5 +89,8 @@ public class MountTypes {
         create(EntityType.WITHER, Items.SOUL_SAND, "textures/entity/wither/wither.png", WitherMountModel::new);
         create(EntityType.HOGLIN, Items.COOKED_PORKCHOP, "textures/entity/hoglin/hoglin.png", HogMountModel::new);
         create(EntityType.RAVAGER, Items.LEATHER, "textures/entity/illager/ravager.png", RavagerMountModel::new);
+        create(EntityType.TURTLE, Items.SCUTE, "textures/entity/turtle/big_sea_turtle.png", TurtleMountModel::new);
+        create(EntityType.SQUID, Items.INK_SAC, "textures/entity/squid.png", SquidModel::new);
+        create(EntityType.GUARDIAN, Items.PRISMARINE_SHARD, "textures/entity/guardian.png", GuardianMountModel::new);
     }
 }

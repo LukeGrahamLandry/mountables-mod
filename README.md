@@ -9,6 +9,7 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
 - change texture of some mounts by using certain items on them
 - use a feather to grant flight, food to heal
 - mounts with a baby version can be toggled with milk
+- some mounts can swim but are slow on land
 - **Types**
     - snow golem (snowball): shears remove pumpkin, carved pumpkin reverts it
     - cow (beef): mushroom for mooshroom, shears to go back
@@ -20,16 +21,19 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - ghast (ghast tear)
     - wolf (bone)
     - cat (cod): cod cycles texture
+    - squid (ink sac): glowstone block for glow squid, ink sac to revert
     - fox (sweet berry): snowball for arctic texture, spruce log to revert
     - wither (soul sand)
     - bee (honey comb)
     - llama (wheat): wheat cycles texture
     - panda (bamboo): bamboo cycles textures
-    - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh for normal
-    - skeleton (bone meal): coal for wither, snow ball for stray, bone for normal
+    - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh reverts it
+    - skeleton (bone meal): coal for wither, snow ball for stray, bone reverts it
+    - guardian (prismarine shard): cooked cod for elder, prismarine shard reverts it
     - ravager (leather)
     - hoglin (cooked pork): rotten flesh for zoglin, pork to revert
     - phantom (phantom membrane)
+    - turtle (scute)
     
 ## Support the Developer
 - https://patreon.com/LukeGrahamLandry

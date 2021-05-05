@@ -113,6 +113,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (this.vanillaType == EntityType.ZOMBIE) textureSuccess = updateZombieTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.SKELETON) textureSuccess = updateSkeletonTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.HOGLIN) textureSuccess = updateHogTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.SQUID) textureSuccess = updateSquidTexture(itemstack.getItem());
+            if (this.vanillaType == EntityType.GUARDIAN) textureSuccess = updateGuardianTexture(itemstack.getItem());
             if (itemstack.getItem() == Items.FEATHER) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
@@ -176,7 +178,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return this.vanillaType == EntityType.COW || this.vanillaType == EntityType.PIG || this.vanillaType == EntityType.SHEEP
                 || this.vanillaType == EntityType.WOLF || this.vanillaType == EntityType.FOX || this.vanillaType == EntityType.CAT
                 || this.vanillaType == EntityType.LLAMA || this.vanillaType == EntityType.PANDA || this.vanillaType == EntityType.ZOMBIE
-                || this.vanillaType == EntityType.WITHER || this.vanillaType == EntityType.GHAST || this.vanillaType == EntityType.HOGLIN;
+                || this.vanillaType == EntityType.WITHER || this.vanillaType == EntityType.GHAST || this.vanillaType == EntityType.HOGLIN
+                || this.vanillaType == EntityType.TURTLE || this.vanillaType == EntityType.CHICKEN;
     }
 
     private void doParticles(BasicParticleType particle) {
@@ -263,6 +266,16 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     public void setChild(boolean x) {
         this.entityData.set(IS_BABY, x);
+    }
+
+    @Override
+    public boolean canBeRiddenInWater(Entity rider) {
+        return this.getVanillaType() == EntityType.SQUID || this.getVanillaType() == EntityType.TURTLE || this.getVanillaType() == EntityType.GUARDIAN;
+    }
+
+    @Override
+    public boolean canBreatheUnderwater() {
+        return this.canBeRiddenInWater(null);
     }
 
     // *** TEXTURE TYPES BY ENTITY *** //
@@ -389,6 +402,28 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         if (item == Items.PORKCHOP){
             this.setTextureType(0);
         } else if (item == Items.ROTTEN_FLESH){
+            this.setTextureType(1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updateSquidTexture(Item item){
+        if (item == Items.INK_SAC){
+            this.setTextureType(0);
+        } else if (item == Items.GLOWSTONE){
+            this.setTextureType(1);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean updateGuardianTexture(Item item){
+        if (item == Items.PRISMARINE_SHARD){
+            this.setTextureType(0);
+        } else if (item == Items.COOKED_COD){
             this.setTextureType(1);
         } else {
             return false;
@@ -622,15 +657,24 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     }
 
+    @Override
+    protected boolean isAffectedByFluids() {
+        return !this.canBeRiddenInWater(null);
+    }
 
     boolean isFlying = false;
     final double flightSpeed = 0.25D;
     public void travel(Vector3d travelVec) {
         if (this.isAlive()) {
-            if (this.isVehicle() && this.canFly()){
+            if (this.isVehicle() && (this.canFly() || this.canBeRiddenInWater(null))){
                 LivingEntity rider = (LivingEntity) this.getPassengers().get(0);
 
-
+                if (this.canBeRiddenInWater(rider) && this.isInWaterOrBubble()){
+                    isFlying = true;
+                }
+                if (this.canBeRiddenInWater(rider) && !this.isInWaterOrBubble() && this.isFlying && !this.canFly()){
+                    isFlying = false;
+                }
                 this.setOnGround(!isFlying);
 
                 if (isFlying) {
@@ -642,6 +686,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     double yComponent = 0;
                     double moveForward = 0;
 
+                    BlockState downState = this.level.getBlockState(this.blockPosition().below(2));
+                    boolean downSolid = !(downState.isAir() || (this.canBeRiddenInWater(null) && downState.is(Blocks.WATER)));  // !isAir should be isSolid
+
                     if (rider.zza > 0) {
                         moveForward = flightSpeed;
                         this.xRot = -MathHelper.clamp(rider.xRot, -10, 10);
@@ -649,7 +696,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                         if (rider.xRot < -10 || rider.xRot > 10) {
                             yComponent = -(Math.toRadians(rider.xRot) * flightSpeed);
                             if (!isFlying && yComponent > 0) isFlying = true;  // that makes no sense?
-                            else if (isFlying && yComponent < 0 && !this.level.getBlockState(this.blockPosition().below(2)).isAir())  // !isAir should be isSolid
+                            else if (isFlying && yComponent < 0 && downSolid)
                                 isFlying = false;
                         }
                     } else if (rider.zza < 0) {
@@ -659,7 +706,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                         if (rider.xRot < -10 || rider.xRot > 10) {
                             yComponent = (Math.toRadians(rider.xRot) * flightSpeed);
                             if (!isFlying && yComponent > 0) isFlying = true;
-                            else if (isFlying && yComponent < 0 && !this.level.getBlockState(this.blockPosition().below(2)).isAir())  // !isAir should be isSolid
+                            else if (isFlying && yComponent < 0 && downSolid)
                                 isFlying = false;
                         }
                     }
@@ -725,7 +772,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
                 this.flyingSpeed = this.getSpeed() * 0.1F;
                 if (this.isControlledByLocalInstance()) {
-                    this.setSpeed((float)this.getAttributeValue(Attributes.MOVEMENT_SPEED));
+                    float speed = this.canBeRiddenInWater(null) ? 0.05F : (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+                    this.setSpeed(speed);
                     super.travel(new Vector3d((double)f, travelVec.y, (double)f1));
                 } else if (livingentity instanceof PlayerEntity) {
                     this.setDeltaMovement(Vector3d.ZERO);
@@ -741,6 +789,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 // flight logic
                 if (livingentity.xRot < -25 && livingentity.zza > 0) isFlying = true;
             } else {
+                float speed = this.canBeRiddenInWater(null) ? 0.05F : (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+                this.setSpeed(speed);
                 this.flyingSpeed = 0.02F;
                 super.travel(travelVec);
             }

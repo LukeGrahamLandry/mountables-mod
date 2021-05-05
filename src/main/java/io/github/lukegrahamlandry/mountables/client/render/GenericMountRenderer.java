@@ -22,7 +22,9 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.PandaEntity;
+import net.minecraft.entity.passive.SquidEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.function.Supplier;
 
@@ -43,6 +45,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     @Override
     public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
         if (mount.getVanillaType() == EntityType.PHANTOM) matrixStack.translate(0, -1, 0);
+        if (mount.getVanillaType() == EntityType.SQUID) matrixStack.translate(0, -0.5, 0);
         super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
     }
 
@@ -50,6 +53,11 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     protected void scale(MountEntity mount, MatrixStack p_225620_2_, float p_225620_3_) {
         if (mount.getVanillaType() == EntityType.GHAST && !mount.isBaby()) p_225620_2_.scale(4.5F, 4.5F, 4.5F);
         if (mount.getVanillaType() == EntityType.WITHER && !mount.isBaby()) p_225620_2_.scale(2,2,2);
+    }
+
+    @Override
+    protected float getBob(MountEntity mount, float ticks) {
+        return mount.getVanillaType() == EntityType.SQUID ? (float) Math.PI / 2: super.getBob(mount, ticks);
     }
 
     public ResourceLocation getTextureLocation(MountEntity mount) {
@@ -83,6 +91,10 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/skeleton/stray.png");
         } else if (mount.getVanillaType() == EntityType.HOGLIN && mount.getTextureType() == 1){
             return new ResourceLocation("textures/entity/hoglin/zoglin.png");
+        } else if (mount.getVanillaType() == EntityType.SQUID && mount.getTextureType() == 1){
+            return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/glow_squid.png");
+        } else if (mount.getVanillaType() == EntityType.GUARDIAN && mount.getTextureType() == 1){
+            return new ResourceLocation("textures/entity/guardian_elder.png");
         }
 
 
