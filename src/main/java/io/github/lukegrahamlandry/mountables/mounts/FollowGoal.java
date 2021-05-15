@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
+import io.github.lukegrahamlandry.mountables.MountablesMain;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.LeavesBlock;
 import net.minecraft.entity.LivingEntity;
@@ -41,11 +42,10 @@ public class FollowGoal extends Goal {
         LivingEntity livingentity = this.tamable.getOwner();
         if (livingentity == null || this.tamable.isVehicle()) {
             return false;
-        } else if (livingentity.isSpectator()) {
-            return false;
         } else if (this.tamable.distanceToSqr(livingentity) < (double)(this.startDistance * this.startDistance)) {
             return false;
         } else {
+            MountablesMain.LOGGER.debug("can follow");
             this.owner = livingentity;
             return true;
         }

@@ -46,7 +46,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Boolean> CAN_FLY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_BABY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.defineId(MountEntity.class, DataSerializers.OPTIONAL_UUID);
-    public static final int maxHealth = 7;
+    public static final int maxHealth = 20;
 
     private ItemStack summonStack;
     private EntityType vanillaType;
@@ -64,10 +64,12 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     @Override
-    protected void dropCustomDeathLoot(DamageSource p_213333_1_, int p_213333_2_, boolean p_213333_3_) {
-        super.dropCustomDeathLoot(p_213333_1_, p_213333_2_, p_213333_3_);
-        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 1, this.canFly(), this.isBaby());
-        this.spawnAtLocation(summonStack);
+    public void die(DamageSource source) {
+        super.die(source);
+        if (!level.isClientSide()){
+            MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 2, this.canFly(), this.isBaby());
+            this.spawnAtLocation(summonStack);
+        }
     }
 
     @Override
@@ -545,6 +547,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     protected void playStepSound(BlockPos p_180429_1_, BlockState p_180429_2_) {
+        /* // TODO replace with each entity's sound somehow
         if (!p_180429_2_.getMaterial().isLiquid()) {
             BlockState blockstate = this.level.getBlockState(p_180429_1_.above());
             SoundType soundtype = p_180429_2_.getSoundType(level, p_180429_1_, this);
@@ -566,18 +569,17 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             }
 
         }
+
+         */
     }
 
     protected void playGallopSound(SoundType p_190680_1_) {
-        this.playSound(SoundEvents.HORSE_GALLOP, p_190680_1_.getVolume() * 0.15F, p_190680_1_.getPitch());
+        // TODO replace with each entity's sound somehow
+        // this.playSound(SoundEvents.HORSE_GALLOP, p_190680_1_.getVolume() * 0.15F, p_190680_1_.getPitch());
     }
 
     public int getMaxSpawnClusterSize() {
         return 6;
-    }
-
-    public int getMaxTemper() {
-        return 100;
     }
 
     protected float getSoundVolume() {
@@ -602,26 +604,13 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return super.isImmobile() && this.isVehicle() && this.isSaddled() || this.isStanding();
     }
 
-    private void moveTail() {
-        this.tailCounter = 1;
-    }
-
-    protected void dropEquipment() {
-        super.dropEquipment();
-        if (this.inventory != null) {
-            for(int i = 0; i < this.inventory.getContainerSize(); ++i) {
-                ItemStack itemstack = this.inventory.getItem(i);
-                if (!itemstack.isEmpty() && !EnchantmentHelper.hasVanishingCurse(itemstack)) {
-                    this.spawnAtLocation(itemstack);
-                }
-            }
-
-        }
-    }
-
-
     public void tick() {
         super.tick();
+
+        // heal over time
+        if (random.nextInt(100) == 0){
+            this.heal(1);
+        }
 
         // fall if you dismount while flying
         if (this.isNoGravity() && !this.isVehicle()) this.setNoGravity(false);
@@ -731,7 +720,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     if (this.isControlledByLocalInstance()){
                         this.flyingSpeed = (float) flightSpeed;
                         // this.setSpeed((float) flightSpeed);
-                        super.travel(new Vector3d(rider.xxa, yComponent, moveForward));
+                        super.travel(new Vector3d(rider.xxa * flightSpeed * 0.5F, yComponent, moveForward));
                     } else if (rider instanceof PlayerEntity) {
                         this.setDeltaMovement(Vector3d.ZERO);
                     }
@@ -904,7 +893,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     public float getScale() {
         boolean smolBaby = this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.SLIME;
-        return this.isBaby() ? (smolBaby ? 0.2F : 0.5F) : 1.0F;
+        return this.isBaby() ? (smolBaby ? 0.2F : 0.45F) : 1.0F;
     }
 
     protected float getStandingEyeHeight(Pose p_213348_1_, EntitySize p_213348_2_) {

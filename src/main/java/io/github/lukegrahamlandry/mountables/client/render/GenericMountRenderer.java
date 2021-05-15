@@ -64,6 +64,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
 
     @Override
     protected float getBob(MountEntity mount, float ticks) {
+        if (mount.getVanillaType() == EntityType.CHICKEN) return 0;
         return mount.getVanillaType() == EntityType.SQUID ? (float) Math.PI / 2: super.getBob(mount, ticks);
     }
 
