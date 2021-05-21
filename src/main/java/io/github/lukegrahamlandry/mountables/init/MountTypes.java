@@ -38,7 +38,6 @@ public class MountTypes {
         return mountLookup.keySet();
     }
 
-
     private static void create(EntityType<? extends LivingEntity> vanillaType, Item recipe, String texture, Supplier<? extends EntityModel> model){
         String name = vanillaType.getRegistryName().getPath() + "_mount";
 

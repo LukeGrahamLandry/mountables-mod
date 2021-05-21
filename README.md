@@ -18,7 +18,7 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - chicken (chicken)
     - spider (string): spiders eye for cave spider, string to revert
     - creeper (gunpowder)
-    - slime (slime ball): magma cream for magma cube texture, slime ball reverts it
+    - slime (slime ball): has bouncy movement. magma cream for magma cube texture, slime ball reverts it
     - ghast (ghast tear)
     - wolf (bone)
     - cat (cod): cod cycles texture

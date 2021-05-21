@@ -36,6 +36,7 @@ public class FollowGoal extends Goal {
         if (!(mount.getNavigation() instanceof GroundPathNavigator) && !(mount.getNavigation() instanceof FlyingPathNavigator)) {
             throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
         }
+        MountablesMain.LOGGER.debug("init follow");
     }
 
     public boolean canUse() {

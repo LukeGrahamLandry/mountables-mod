@@ -40,8 +40,9 @@ public class MagmaMountModel extends SegmentedModel<MountEntity> {
     public void setupAnim(MountEntity p_225597_1_, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_) {
     }
 
-    public void prepareMobModel(MountEntity p_212843_1_, float p_212843_2_, float p_212843_3_, float p_212843_4_) {
-        float f = 0; // MathHelper.lerp(p_212843_4_, p_212843_1_.oSquish, p_212843_1_.squish);
+
+    public void prepareMobModel(MountEntity mount, float p_212843_2_, float p_212843_3_, float p_212843_4_) {
+        float f = MathHelper.lerp(p_212843_4_, mount.oSquish, mount.squish);
         if (f < 0.0F) {
             f = 0.0F;
         }

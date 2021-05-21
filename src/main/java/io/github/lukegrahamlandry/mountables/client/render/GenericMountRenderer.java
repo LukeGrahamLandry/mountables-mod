@@ -52,13 +52,19 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     protected void scale(MountEntity mount, MatrixStack p_225620_2_, float p_225620_3_) {
         if (mount.getVanillaType() == EntityType.GHAST && !mount.isBaby()) p_225620_2_.scale(4.5F, 4.5F, 4.5F);
         if (mount.getVanillaType() == EntityType.WITHER && !mount.isBaby()) p_225620_2_.scale(2,2,2);
-        if (mount.getVanillaType() == EntityType.SLIME || mount.getVanillaType() == EntityType.MAGMA_CUBE){
+        if (mount.getVanillaType() == EntityType.SLIME){
             float size = mount.isBaby() ? 1 : 4;
             p_225620_2_.scale(0.999F, 0.999F, 0.999F);
             p_225620_2_.translate(0.0D, (double)0.001F, 0.0D);
-            float f2 = 0; // MathHelper.lerp(p_225620_3_, mount.oSquish, mount.squish) / (f1 * 0.5F + 1.0F);
+            float f2 = MathHelper.lerp(p_225620_3_, mount.oSquish, mount.squish) / (size * 0.5F + 1.0F);
             float f3 = 1.0F / (f2 + 1.0F);
             p_225620_2_.scale(f3 * size, 1.0F / f3 * size, f3 * size);
+        }
+        if (mount.getVanillaType() == EntityType.MAGMA_CUBE){
+            float size = mount.isBaby() ? 1 : 4;
+            float f = MathHelper.lerp(p_225620_3_, mount.oSquish, mount.squish) / (size * 0.5F + 1.0F);
+            float f1 = 1.0F / (f + 1.0F);
+            p_225620_2_.scale(f1 * size, 1.0F / f1 * size, f1 * size);
         }
     }
 
