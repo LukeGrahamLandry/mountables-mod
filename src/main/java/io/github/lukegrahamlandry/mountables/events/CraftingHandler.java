@@ -18,9 +18,7 @@ public class CraftingHandler {
         if (!(event.getCrafting().getItem() instanceof MountSummonItem)) return;
 
         Item recipeItem = event.getInventory().getItem(0).getItem();
-        MountablesMain.LOGGER.debug(recipeItem);
         EntityType type = MountTypes.getToCraft(recipeItem);
-        MountablesMain.LOGGER.debug(type);
         MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, canFlyByDefault(type), false);
     }
 

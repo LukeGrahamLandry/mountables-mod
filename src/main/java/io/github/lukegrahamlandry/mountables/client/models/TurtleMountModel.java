@@ -13,7 +13,7 @@ public class TurtleMountModel extends QuadrupedModel<MountEntity> {
     private final ModelRenderer eggBelly;
 
     public TurtleMountModel() {
-        super(12, 0, true, 120.0F, 0.0F, 9.0F, 6.0F, 120);
+        super(12, 0.7F, true, 120.0F, 0.0F, 9.0F, 6.0F, 120);
         float p_i48834_1_ = 0;
         this.texWidth = 128;
         this.texHeight = 64;
@@ -62,14 +62,15 @@ public class TurtleMountModel extends QuadrupedModel<MountEntity> {
         if (!p_225597_1_.isInWater() && p_225597_1_.isOnGround()) {
             float f = 1; // p_225597_1_.isLayingEgg() ? 4.0F : 1.0F;
             float f1 = 1;// p_225597_1_.isLayingEgg() ? 2.0F : 1.0F;
-            float f2 = 5.0F;
-            this.leg2.yRot = MathHelper.cos(f * p_225597_2_+ (float)Math.PI) * 8.0F * p_225597_3_ * f1;
+            float period = 1.0F;
+
+            this.leg2.yRot = MathHelper.cos(f * p_225597_2_ * period + (float)Math.PI) * 8.0F * p_225597_3_ * f1;
             this.leg2.zRot = 0.0F;
-            this.leg3.yRot = MathHelper.cos(f * p_225597_2_) * 8.0F * p_225597_3_ * f1;
+            this.leg3.yRot = MathHelper.cos(f * p_225597_2_ * period) * 8.0F * p_225597_3_ * f1;
             this.leg3.zRot = 0.0F;
-            this.leg0.yRot = MathHelper.cos(p_225597_2_ + (float)Math.PI) * 3.0F * p_225597_3_;
+            this.leg0.yRot = MathHelper.cos(p_225597_2_ * period + (float)Math.PI) * 3.0F * p_225597_3_;
             this.leg0.xRot = 0.0F;
-            this.leg1.yRot = MathHelper.cos(p_225597_2_) * 3.0F * p_225597_3_;
+            this.leg1.yRot = MathHelper.cos(p_225597_2_ * period) * 3.0F * p_225597_3_;
             this.leg1.xRot = 0.0F;
         }
 

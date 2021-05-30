@@ -64,7 +64,7 @@ public class GuardianMountModel extends SegmentedModel<MountEntity> {
         float f = p_225597_4_ - (float)p_225597_1_.tickCount;
         this.head.yRot = p_225597_5_ * ((float)Math.PI / 180F);
         this.head.xRot = p_225597_6_ * ((float)Math.PI / 180F);
-        float f1 = 0.5F;//(1.0F - p_225597_1_.getSpikesAnimation(f)) * 0.55F;
+        float f1 = 0.05F;//(1.0F - p_225597_1_.getSpikesAnimation(f)) * 0.55F;
         this.setupSpikes(p_225597_4_, f1);
         this.eye.z = -8.25F;
         Entity entity = null;// Minecraft.getInstance().getCameraEntity();
@@ -90,7 +90,7 @@ public class GuardianMountModel extends SegmentedModel<MountEntity> {
         }
 
         this.eye.visible = true;
-        float f2 = 0;//p_225597_1_.getTailAnimation(f);
+        float f2 = (float) Math.sin(p_225597_1_.level.getGameTime()); // 0;//p_225597_1_.getTailAnimation(f);
         this.tailParts[0].yRot = MathHelper.sin(f2) * (float)Math.PI * 0.05F;
         this.tailParts[1].yRot = MathHelper.sin(f2) * (float)Math.PI * 0.1F;
         this.tailParts[1].x = -1.5F;

@@ -74,10 +74,10 @@ public class RavagerMountModel extends SegmentedModel<MountEntity> {
         this.head.yRot = p_225597_5_ * ((float)Math.PI / 180F);
         this.body.xRot = ((float)Math.PI / 2F);
         float f = 0.4F * p_225597_3_;
-        this.leg0.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 5) * f;
-        this.leg1.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 5 + (float)Math.PI) * f;
-        this.leg2.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 5 + (float)Math.PI) * f;
-        this.leg3.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 5) * f;
+        this.leg0.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 3) * f;
+        this.leg1.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 3 + (float)Math.PI) * f;
+        this.leg2.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 3 + (float)Math.PI) * f;
+        this.leg3.xRot = MathHelper.cos(p_225597_2_ * 0.6662F / 3) * f;
     }
 
     public void prepareMobModel(MountEntity p_212843_1_, float p_212843_2_, float p_212843_3_, float p_212843_4_) {

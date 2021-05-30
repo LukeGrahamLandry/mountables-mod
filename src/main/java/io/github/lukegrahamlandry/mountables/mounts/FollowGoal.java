@@ -36,7 +36,6 @@ public class FollowGoal extends Goal {
         if (!(mount.getNavigation() instanceof GroundPathNavigator) && !(mount.getNavigation() instanceof FlyingPathNavigator)) {
             throw new IllegalArgumentException("Unsupported mob type for FollowOwnerGoal");
         }
-        MountablesMain.LOGGER.debug("init follow");
     }
 
     public boolean canUse() {
@@ -46,7 +45,6 @@ public class FollowGoal extends Goal {
         } else if (this.tamable.distanceToSqr(livingentity) < (double)(this.startDistance * this.startDistance)) {
             return false;
         } else {
-            MountablesMain.LOGGER.debug("can follow");
             this.owner = livingentity;
             return true;
         }

@@ -97,6 +97,7 @@ public class MountSummonItem extends Item {
             if (summon != null) {
                 ((MountEntity)summon).setMountType(itemstack);
                 ((MountEntity)summon).setOwnerUUID(context.getPlayer().getUUID());
+                summon.refreshDimensions();
                 itemstack.shrink(1);
             }
 

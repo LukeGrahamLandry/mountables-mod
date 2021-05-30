@@ -231,7 +231,6 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     @Override
     protected void registerGoals() {
-        MountablesMain.LOGGER.debug("do goals");
         this.goalSelector.addGoal(1, new SwimGoal(this));
         this.goalSelector.addGoal(1, new FollowGoal(this, 1.25, 10, 2, false));
     }
@@ -494,14 +493,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     public int tailCounter;
     public int sprintCounter;
     protected boolean isJumping;
-    protected Inventory inventory;
     protected float playerJumpPendingScale;
     private boolean allowStandSliding;
     private float eatAnim;
-    private float eatAnimO;
-    private float standAnim;
-    private float standAnimO;
-    protected boolean canGallop = true;
     protected int gallopSoundCounter;
     private boolean standing = true;
 
@@ -528,7 +522,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     public boolean causeFallDamage(float p_225503_1_, float p_225503_2_) {
         if (p_225503_1_ > 1.0F) {
-            this.playSound(SoundEvents.HORSE_LAND, 0.4F, 1.0F);
+            // this.playSound(SoundEvents.HORSE_LAND, 0.4F, 1.0F);
         }
 
         int i = this.calculateFallDamage(p_225503_1_, p_225503_2_);
@@ -570,6 +564,31 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             this.stand();
         }
 
+        if (this.getVanillaType() == EntityType.BEE) return SoundEvents.BEE_LOOP;
+        if (this.getVanillaType() == EntityType.SHEEP) return SoundEvents.SHEEP_AMBIENT;
+        if (this.getVanillaType() == EntityType.PIG) return SoundEvents.PIG_AMBIENT;
+        if (this.getVanillaType() == EntityType.COW) return SoundEvents.COW_AMBIENT;
+        if (this.getVanillaType() == EntityType.WOLF) return SoundEvents.WOLF_AMBIENT;
+        if (this.getVanillaType() == EntityType.SNOW_GOLEM) return SoundEvents.SNOW_GOLEM_AMBIENT;
+        if (this.getVanillaType() == EntityType.CHICKEN) return SoundEvents.CHICKEN_AMBIENT;
+        if (this.getVanillaType() == EntityType.SPIDER) return SoundEvents.SPIDER_AMBIENT;
+        if (this.getVanillaType() == EntityType.CREEPER) return null;
+        if (this.getVanillaType() == EntityType.CAT) return SoundEvents.CAT_AMBIENT;
+        if (this.getVanillaType() == EntityType.LLAMA) return SoundEvents.LLAMA_AMBIENT;
+        if (this.getVanillaType() == EntityType.FOX) return SoundEvents.FOX_AMBIENT;
+        if (this.getVanillaType() == EntityType.PANDA) return SoundEvents.PANDA_AMBIENT;
+        if (this.getVanillaType() == EntityType.ZOMBIE) return SoundEvents.ZOMBIE_AMBIENT;
+        if (this.getVanillaType() == EntityType.SKELETON) return SoundEvents.SKELETON_AMBIENT;
+        if (this.getVanillaType() == EntityType.PHANTOM) return SoundEvents.PHANTOM_AMBIENT;
+        if (this.getVanillaType() == EntityType.GHAST) return SoundEvents.GHAST_AMBIENT;
+        if (this.getVanillaType() == EntityType.SLIME) return null;
+        if (this.getVanillaType() == EntityType.WITHER) return SoundEvents.WITHER_AMBIENT;
+        if (this.getVanillaType() == EntityType.HOGLIN) return SoundEvents.HOGLIN_AMBIENT;
+        if (this.getVanillaType() == EntityType.RAVAGER) return SoundEvents.RAVAGER_AMBIENT;
+        if (this.getVanillaType() == EntityType.TURTLE) return this.isInWaterOrBubble() ? null : SoundEvents.TURTLE_AMBIENT_LAND;
+        if (this.getVanillaType() == EntityType.SQUID) return SoundEvents.SQUID_AMBIENT;
+        if (this.getVanillaType() == EntityType.GUARDIAN) return this.isInWaterOrBubble() ? SoundEvents.GUARDIAN_AMBIENT : SoundEvents.GUARDIAN_AMBIENT_LAND;
+
         return null;
     }
 
@@ -580,14 +599,15 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     protected void playStepSound(BlockPos p_180429_1_, BlockState p_180429_2_) {
-        /* // TODO replace with each entity's sound somehow
         if (!p_180429_2_.getMaterial().isLiquid()) {
             BlockState blockstate = this.level.getBlockState(p_180429_1_.above());
             SoundType soundtype = p_180429_2_.getSoundType(level, p_180429_1_, this);
             if (blockstate.is(Blocks.SNOW)) {
                 soundtype = blockstate.getSoundType(level, p_180429_1_, this);
             }
+            // todo: play each entity's walk sound somehow
 
+            /*
             if (this.isVehicle() && this.canGallop) {
                 ++this.gallopSoundCounter;
                 if (this.gallopSoundCounter > 5 && this.gallopSoundCounter % 3 == 0) {
@@ -601,9 +621,11 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 this.playSound(SoundEvents.HORSE_STEP, soundtype.getVolume() * 0.15F, soundtype.getPitch());
             }
 
+             */
+
         }
 
-         */
+
     }
 
     protected void playGallopSound(SoundType p_190680_1_) {
@@ -620,7 +642,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public int getAmbientSoundInterval() {
-        return 400;
+        return 350 + random.nextInt(100);
     }
 
     protected void doPlayerRide(PlayerEntity player) {
@@ -638,6 +660,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public void tick() {
+        if (firstTick)this.refreshDimensions();
         super.tick();
 
         // heal over time
@@ -664,10 +687,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             }
         }
 
-        this.standAnimO = this.standAnim;
         if (this.isStanding()) {
             this.eatAnim = 0.0F;
-            this.eatAnimO = this.eatAnim;
             
             // this was for shift forwards when you jump
             //this.standAnim += (1.0F - this.standAnim) * 0.4F + 0.05F;
@@ -721,6 +742,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     boolean isFlying = false;
     final double flightSpeed = 0.25D;
+    int slimeHopTimer = 10;
     public void travel(Vector3d travelVec) {
         if (this.isAlive()) {
             if (this.isVehicle() && (this.canFly() || this.canBeRiddenInWater(null)) && !(this.getVanillaType() == EntityType.SLIME)){
@@ -811,8 +833,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     } else {
                         d1 = d0;
                     }
-                    if (this.canFly()) d1 = 0.5;
-                    if (this.getVanillaType() == EntityType.SLIME) d1 *= 1.75;
+                    if (this.canFly() && !(this.getVanillaType() == EntityType.SLIME)) d1 = 0.5;
 
                     Vector3d vector3d = this.getDeltaMovement();
                     this.setDeltaMovement(vector3d.x, d1, vector3d.z);
@@ -829,7 +850,11 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     this.playerJumpPendingScale = 0.0F;
                     if (canFly()) isFlying = true;
                 } else if (this.onGround && this.getVanillaType() == EntityType.SLIME && (f != 0 || f1 != 0)){
-                    doSlimeJump(f1, 1);
+                    if (slimeHopTimer >= 3){
+                        doSlimeJump((float) f1, 1);
+                        slimeHopTimer = 0;
+                    }
+                    slimeHopTimer++;
                 }
 
                 this.flyingSpeed = this.getSpeed() * 0.1F;
@@ -855,7 +880,11 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 this.setSpeed(speed);
                 this.flyingSpeed = 0.02F;
                 if (this.onGround && this.getVanillaType() == EntityType.SLIME && (travelVec.x != 0 || travelVec.z != 0)){
-                    doSlimeJump((float) travelVec.z, 0.5F);
+                    if (slimeHopTimer >= 5){
+                        doSlimeJump((float) travelVec.z, 0.25F);
+                        slimeHopTimer = 0;
+                    }
+                    slimeHopTimer++;
                 }
                 super.travel(travelVec);
             }
@@ -875,11 +904,13 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             float f3 = MathHelper.cos(this.yRot * ((float)Math.PI / 180F));
             this.setDeltaMovement(this.getDeltaMovement().add((double)(-0.4F * f2 * force), 0.0D, (double)(0.4F * f3 * force)));
         }
-        this.onGround = false;  // without this it jitters maybe use 10 tick timer instead
+        // this.onGround = false;  // without this it jitters maybe use 10 tick timer instead
     }
 
     protected void playJumpSound() {
-        this.playSound(SoundEvents.HORSE_JUMP, 0.4F, 1.0F);
+        if (this.getVanillaType() == EntityType.SLIME || this.getVanillaType() == EntityType.MAGMA_CUBE){
+            this.playSound(SoundEvents.SLIME_JUMP, 0.4F, 1.0F);
+        }
     }
 
     public boolean canBeControlledByRider() {
