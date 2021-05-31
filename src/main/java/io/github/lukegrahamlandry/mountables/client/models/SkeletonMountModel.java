@@ -53,7 +53,7 @@ public class SkeletonMountModel extends BipedModel<MountEntity> {
     }
 
     public void setupAnim(MountEntity p_225597_1_, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_) {
-        super.setupAnim(p_225597_1_, p_225597_2_, p_225597_3_, p_225597_4_, p_225597_5_, p_225597_6_);
+        super.setupAnim(p_225597_1_, p_225597_2_ / 4, p_225597_3_, p_225597_4_, p_225597_5_, p_225597_6_);
         ItemStack itemstack = p_225597_1_.getMainHandItem();
         if (p_225597_1_.isAggressive() && (itemstack.isEmpty() || itemstack.getItem() != Items.BOW)) {
             float f = MathHelper.sin(this.attackTime * (float)Math.PI);

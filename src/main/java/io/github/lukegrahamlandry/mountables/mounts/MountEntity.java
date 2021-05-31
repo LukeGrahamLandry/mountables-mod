@@ -1,19 +1,16 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
-import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -87,6 +84,11 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         super.onAddedToWorld();
         setStanding(false);
         this.refreshDimensions();
+
+        // hopefully fix crazy dying with one probe bug
+        if (this.getHealth() < 3){
+            this.heal(2);
+        }
     }
 
     @Override
@@ -159,7 +161,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (itemstack.getItem() == Items.MILK_BUCKET && allowBaby()){
                 this.setChild(!this.isBaby());
                 if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
-                player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                if (!player.isCreative()) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
                 return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
 
@@ -598,16 +600,58 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return null;
     }
 
+    @Nullable
+    protected SoundEvent getStepSound() {
+        if (this.getVanillaType() == EntityType.BEE) return null;
+        if (this.getVanillaType() == EntityType.SHEEP) return SoundEvents.SHEEP_STEP;
+        if (this.getVanillaType() == EntityType.PIG) return SoundEvents.PIG_STEP;
+        if (this.getVanillaType() == EntityType.COW) return SoundEvents.COW_STEP;
+        if (this.getVanillaType() == EntityType.WOLF) return SoundEvents.WOLF_STEP;
+        if (this.getVanillaType() == EntityType.SNOW_GOLEM) return null;
+        if (this.getVanillaType() == EntityType.CHICKEN) return SoundEvents.CHICKEN_STEP;
+        if (this.getVanillaType() == EntityType.SPIDER) return SoundEvents.SPIDER_STEP;
+        if (this.getVanillaType() == EntityType.CREEPER) return null;
+        if (this.getVanillaType() == EntityType.CAT) return null;
+        if (this.getVanillaType() == EntityType.LLAMA) return SoundEvents.LLAMA_STEP;
+        if (this.getVanillaType() == EntityType.FOX) return null;
+        if (this.getVanillaType() == EntityType.PANDA) return SoundEvents.PANDA_STEP;
+        if (this.getVanillaType() == EntityType.ZOMBIE) return SoundEvents.ZOMBIE_STEP;
+        if (this.getVanillaType() == EntityType.SKELETON) return SoundEvents.SKELETON_STEP;
+        if (this.getVanillaType() == EntityType.PHANTOM) return null;
+        if (this.getVanillaType() == EntityType.GHAST) return null;
+        if (this.getVanillaType() == EntityType.SLIME) return SoundEvents.SLIME_BLOCK_STEP;
+        if (this.getVanillaType() == EntityType.WITHER) return null;
+        if (this.getVanillaType() == EntityType.HOGLIN) return SoundEvents.HOGLIN_STEP;
+        if (this.getVanillaType() == EntityType.RAVAGER) return SoundEvents.RAVAGER_STEP;
+        if (this.getVanillaType() == EntityType.TURTLE) return this.isInWaterOrBubble() ? SoundEvents.TURTLE_SWIM : SoundEvents.TURTLE_SHAMBLE;
+        if (this.getVanillaType() == EntityType.SQUID) return null;
+        if (this.getVanillaType() == EntityType.GUARDIAN) return null;
+
+        return null;
+    }
+
+    @Override
+    protected SoundEvent getSwimSound() {
+        if (this.getVanillaType() == EntityType.TURTLE) return SoundEvents.TURTLE_SWIM;
+        if (this.getVanillaType() == EntityType.HOGLIN) return SoundEvents.HOSTILE_SWIM;
+        return SoundEvents.GENERIC_SWIM;
+    }
+
+    @Override
     protected void playStepSound(BlockPos p_180429_1_, BlockState p_180429_2_) {
+        if (this.getStepSound() == null) return;
         if (!p_180429_2_.getMaterial().isLiquid()) {
             BlockState blockstate = this.level.getBlockState(p_180429_1_.above());
             SoundType soundtype = p_180429_2_.getSoundType(level, p_180429_1_, this);
             if (blockstate.is(Blocks.SNOW)) {
                 soundtype = blockstate.getSoundType(level, p_180429_1_, this);
             }
-            // todo: play each entity's walk sound somehow
 
-            /*
+            // should i shift based on the soundtype idk
+
+            this.playSound(this.getStepSound(), 0.15F, 1.0F);
+
+            /* // horse
             if (this.isVehicle() && this.canGallop) {
                 ++this.gallopSoundCounter;
                 if (this.gallopSoundCounter > 5 && this.gallopSoundCounter % 3 == 0) {
@@ -629,7 +673,6 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     protected void playGallopSound(SoundType p_190680_1_) {
-        // TODO replace with each entity's sound somehow
         // this.playSound(SoundEvents.HORSE_GALLOP, p_190680_1_.getVolume() * 0.15F, p_190680_1_.getPitch());
     }
 
@@ -660,8 +703,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     public void tick() {
-        if (firstTick)this.refreshDimensions();
         super.tick();
+
+        // fix the wierd player sized hitbox
+        this.refreshDimensions();
 
         // heal over time
         if (random.nextInt(100) == 0){
@@ -714,9 +759,19 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             this.targetSquish = 1.0F;
         }
 
+        if (this.justLanded) {
+            this.targetSquish = -0.5F;
+            this.justLanded = false;
+        } else if (this.justAirJumped) {
+            this.targetSquish = 1.0F;
+            this.justAirJumped = false;
+        }
+
         this.wasOnGround = this.onGround;
         this.decreaseSquish();
     }
+    boolean justAirJumped = false;
+    boolean justLanded = false;  // unused cause what does landing even mean
 
     protected void decreaseSquish() {
         this.targetSquish *= 0.6F;
@@ -826,6 +881,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
                 boolean allowJump = (this.onGround && !this.isJumping()) || (this.getVanillaType() == EntityType.SLIME && canFly()) ;
                 if ((this.playerJumpPendingScale > 0.0F && allowJump)) {
+                    this.justAirJumped = true;
+
                     double d0 = this.getCustomJump() * (double)this.playerJumpPendingScale * (double)this.getBlockJumpFactor();
                     double d1;
                     if (this.hasEffect(Effects.JUMP)) {
@@ -843,7 +900,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     if (f1 > 0.0F) {
                         float f2 = MathHelper.sin(this.yRot * ((float)Math.PI / 180F));
                         float f3 = MathHelper.cos(this.yRot * ((float)Math.PI / 180F));
-                        float force = this.getVanillaType() == EntityType.SLIME && canFly() ? 4 : 1;
+                        float force = this.getVanillaType() == EntityType.SLIME && canFly() ? 2 : 1;
                         this.setDeltaMovement(this.getDeltaMovement().add((double)(-0.4F * f2 * this.playerJumpPendingScale * force), 0.0D, (double)(0.4F * f3 * this.playerJumpPendingScale * force)));
                     }
 
@@ -948,7 +1005,52 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
 
     public void positionRider(Entity p_184232_1_) {
-        super.positionRider(p_184232_1_);
+        if (this.hasPassenger(p_184232_1_)) {
+            float xDir = MathHelper.sin(this.yBodyRot * ((float)Math.PI / 180F));
+            float zDir = MathHelper.cos(this.yBodyRot * ((float)Math.PI / 180F));
+            float shiftX = 0;
+            float shiftZ = 0;
+
+            double d0 = this.getY() + this.getPassengersRidingOffset() + p_184232_1_.getMyRidingOffset();
+
+            if (this.getVanillaType() == EntityType.ZOMBIE || this.getVanillaType() == EntityType.SKELETON || this.getVanillaType() == EntityType.CREEPER || this.getVanillaType() == EntityType.SNOW_GOLEM){
+                shiftX = xDir * 0.45F;
+                shiftZ = zDir * -0.45F;
+                d0 -= 0.25D;
+            }
+
+            if (this.isBaby() && (this.getVanillaType() == EntityType.CHICKEN || this.getVanillaType() == EntityType.WITHER || this.getVanillaType() == EntityType.COW)){
+                shiftX = xDir * 0.45F;
+                shiftZ = zDir * -0.45F;
+            }
+
+            if (!this.isBaby() && (this.getVanillaType() == EntityType.FOX)){
+                shiftX = xDir * 0.45F;
+                shiftZ = zDir * -0.45F;
+            }
+
+            if (!this.isBaby() && this.getVanillaType() == EntityType.FOX){
+                d0 -= 0.1F;
+            }
+
+            if (!this.isBaby() && this.getVanillaType() == EntityType.RAVAGER){
+                d0 -= 0.2F;
+            }
+
+            if (!this.isBaby() && this.getVanillaType() == EntityType.WITHER){
+                d0 -= 0.3F;
+            }
+
+            if (this.isBaby() && (this.getVanillaType() == EntityType.CAT || this.getVanillaType() == EntityType.LLAMA)){
+                d0 -= 0.1F;
+            }
+
+            if (this.isBaby() && this.getVanillaType() == EntityType.TURTLE){
+                d0 -= 0.25F;
+            }
+
+            p_184232_1_.setPos(this.getX() + shiftX, d0, this.getZ() + shiftZ);
+        }
         if (p_184232_1_ instanceof MobEntity) {
             MobEntity mobentity = (MobEntity)p_184232_1_;
             this.yBodyRot = mobentity.yBodyRot;
@@ -973,7 +1075,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Override
     public double getPassengersRidingOffset() {
         double scale = 0.75D;
-        if (!this.isBaby() && (this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.WITHER || this.getVanillaType() == EntityType.RAVAGER || this.getVanillaType() == EntityType.HOGLIN)) scale = 1;
+        if (!this.isBaby() && (this.getVanillaType() == EntityType.SLIME || this.getVanillaType() == EntityType.GHAST || this.getVanillaType() == EntityType.WITHER || this.getVanillaType() == EntityType.RAVAGER || this.getVanillaType() == EntityType.HOGLIN)) scale = 1;
         if (this.isBaby()) scale = 0.6;
         return (double)this.getDimensions(getPose()).height * scale;
     }

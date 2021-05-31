@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.monster.CreeperEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.MobSpawnerTileEntity;
@@ -103,5 +104,27 @@ public class MountSummonItem extends Item {
 
             return ActionResultType.CONSUME;
         }
+    }
+
+    // if i just do this in the PlayerEvent.ItemCraftedEvent or here, it cant set nbt when its shift clicked out because the event is given a copy of the stack
+    // so the mixin is what is actually useful. this is just a last ditch attempt at compatability with mod crafting table things that dont use the right container
+    @Override
+    public void onCraftedBy(ItemStack stack, World p_77622_2_, PlayerEntity player) {
+        // the open container at this point will always be WorkbenchContainer
+        // get an item from the crafting grid (not the middle one) and it must the the item for that mount type
+        Item recipeItem = player.containerMenu.slots.get(1).getItem().getItem();
+        // MountablesMain.LOGGER.debug(recipeItem);
+
+        EntityType type = MountTypes.getToCraft(recipeItem);
+
+        if (type == null) return;
+
+        // MountablesMain.LOGGER.debug(type);
+
+        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false);
+    }
+
+    public static boolean canFlyByDefault(EntityType type) {
+        return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM;
     }
 }

@@ -60,10 +60,10 @@ public class FoxMountModel extends AgeableModel<MountEntity> {
     public void prepareMobModel(MountEntity p_212843_1_, float p_212843_2_, float p_212843_3_, float p_212843_4_) {
         this.body.xRot = ((float)Math.PI / 2F);
         this.tail.xRot = -0.05235988F;
-        this.leg0.xRot = MathHelper.cos(p_212843_2_ * 0.6662F) * 1.4F * p_212843_3_;
-        this.leg1.xRot = MathHelper.cos(p_212843_2_ * 0.6662F + (float)Math.PI) * 1.4F * p_212843_3_;
-        this.leg2.xRot = MathHelper.cos(p_212843_2_ * 0.6662F + (float)Math.PI) * 1.4F * p_212843_3_;
-        this.leg3.xRot = MathHelper.cos(p_212843_2_ * 0.6662F) * 1.4F * p_212843_3_;
+        this.leg0.xRot = MathHelper.cos(p_212843_2_ * 0.2662F) * 1.4F * p_212843_3_;
+        this.leg1.xRot = MathHelper.cos(p_212843_2_ * 0.2662F + (float)Math.PI) * 1.4F * p_212843_3_;
+        this.leg2.xRot = MathHelper.cos(p_212843_2_ * 0.2662F + (float)Math.PI) * 1.4F * p_212843_3_;
+        this.leg3.xRot = MathHelper.cos(p_212843_2_ * 0.2662F) * 1.4F * p_212843_3_;
         this.head.setPos(-1.0F, 16.5F, -3.0F);
         this.head.yRot = 0.0F;
         this.head.zRot = 0;// p_212843_1_.getHeadRollAngle(p_212843_4_);

@@ -15,11 +15,19 @@ import net.minecraftforge.fml.common.Mod;
 public class CraftingHandler {
     @SubscribeEvent
     public static void onCraft(PlayerEvent.ItemCraftedEvent event){
-        if (!(event.getCrafting().getItem() instanceof MountSummonItem)) return;
+        // MountablesMain.LOGGER.debug(event.getCrafting().getItem() + " " + event.getInventory());
 
-        Item recipeItem = event.getInventory().getItem(0).getItem();
-        EntityType type = MountTypes.getToCraft(recipeItem);
-        MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, canFlyByDefault(type), false);
+        // if (!(event.getCrafting().getItem() instanceof MountSummonItem)) return;
+
+        // Item recipeItem = event.getInventory().getItem(0).getItem();
+
+        // MountablesMain.LOGGER.debug(recipeItem);
+
+        // EntityType type = MountTypes.getToCraft(recipeItem);
+
+        // MountablesMain.LOGGER.debug(type);
+
+        // MountSummonItem.writeNBT(event.getCrafting(), type, 0, MountEntity.maxHealth, canFlyByDefault(type), false);
     }
 
     private static boolean canFlyByDefault(EntityType type) {

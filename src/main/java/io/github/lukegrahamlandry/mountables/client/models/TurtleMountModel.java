@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.client.renderer.entity.model.QuadrupedModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
@@ -60,17 +61,17 @@ public class TurtleMountModel extends QuadrupedModel<MountEntity> {
         this.leg1.yRot = 0.0F;
         this.eggBelly.xRot = ((float)Math.PI / 2F);
         if (!p_225597_1_.isInWater() && p_225597_1_.isOnGround()) {
-            float f = 1; // p_225597_1_.isLayingEgg() ? 4.0F : 1.0F;
-            float f1 = 1;// p_225597_1_.isLayingEgg() ? 2.0F : 1.0F;
-            float period = 1.0F;
+            float period = 0.5F;
 
-            this.leg2.yRot = MathHelper.cos(f * p_225597_2_ * period + (float)Math.PI) * 8.0F * p_225597_3_ * f1;
+            // MountablesMain.LOGGER.debug(p_225597_3_);
+            float amp = p_225597_3_ > 0.005F ? 0.1F : p_225597_3_; // p_225597_3_
+            this.leg2.yRot = MathHelper.cos(p_225597_2_ * period + (float)Math.PI) * 8.0F * amp;
             this.leg2.zRot = 0.0F;
-            this.leg3.yRot = MathHelper.cos(f * p_225597_2_ * period) * 8.0F * p_225597_3_ * f1;
+            this.leg3.yRot = MathHelper.cos(p_225597_2_ * period) * 8.0F * amp;
             this.leg3.zRot = 0.0F;
-            this.leg0.yRot = MathHelper.cos(p_225597_2_ * period + (float)Math.PI) * 3.0F * p_225597_3_;
+            this.leg0.yRot = MathHelper.cos(p_225597_2_ * period + (float)Math.PI) * 3.0F * amp;
             this.leg0.xRot = 0.0F;
-            this.leg1.yRot = MathHelper.cos(p_225597_2_ * period) * 3.0F * p_225597_3_;
+            this.leg1.yRot = MathHelper.cos(p_225597_2_ * period) * 3.0F * amp;
             this.leg1.xRot = 0.0F;
         }
 

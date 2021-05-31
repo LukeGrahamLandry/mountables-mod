@@ -1,0 +1,10 @@
+{
+  "required": true,
+  "package": "io.github.lukegrahamlandry.mountables.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "mountables.refmap.json",
+  "mixins": [
+   "CraftSlotMixin"
+  ],
+  "minVersion": "0.8"
+}
