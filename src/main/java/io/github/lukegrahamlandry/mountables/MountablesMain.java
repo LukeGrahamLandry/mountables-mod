@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables;
 
+import io.github.lukegrahamlandry.mountables.config.MountsConfig;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
@@ -15,9 +16,12 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,6 +37,9 @@ public class MountablesMain {
         ItemInit.ITEMS.register(modEventBus);
         modEventBus.addListener(MountablesMain::mobAttributes);
         modEventBus.addListener(MountablesMain::generateEggMap);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, MountsConfig.server_config);
+        MountsConfig.loadConfig(MountsConfig.server_config, FMLPaths.CONFIGDIR.get().resolve(MOD_ID + ".toml").toString());
     }
 
     public static void mobAttributes(EntityAttributeCreationEvent event){

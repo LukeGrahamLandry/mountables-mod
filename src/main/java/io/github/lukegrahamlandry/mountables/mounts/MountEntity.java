@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
+import io.github.lukegrahamlandry.mountables.config.MountsConfig;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
@@ -147,13 +148,16 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             if (this.vanillaType == EntityType.SQUID) textureSuccess = updateSquidTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.GUARDIAN) textureSuccess = updateGuardianTexture(itemstack.getItem());
             if (this.vanillaType == EntityType.SLIME) textureSuccess = updateSlimeTexture(itemstack.getItem());
-            if (itemstack.getItem() == Items.FEATHER) {
+            if (itemstack.getItem() == MountsConfig.getFlightItem()) {
                 textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
             }
             if (textureSuccess){
-                if (itemstack.getItem() == Items.WATER_BUCKET) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
-                else if (itemstack.getItem() != Items.SHEARS) itemstack.shrink(1);
+                if (MountsConfig.doesTextureSwapConsume()){
+                    if (itemstack.getItem() == Items.WATER_BUCKET) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
+                    else if (itemstack.getItem() != Items.SHEARS) itemstack.shrink(1);
+                }
+
                 if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
                 return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
@@ -279,7 +283,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     private boolean canFly() {
-        return this.entityData.get(CAN_FLY);
+        return this.entityData.get(CAN_FLY) && (this.level.isClientSide() || MountsConfig.isFlightAllowed());
     }
 
     public void setOwnerUUID(UUID id) {
@@ -890,6 +894,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     } else {
                         d1 = d0;
                     }
+                    if (this.getVanillaType() == EntityType.SLIME) d1 *= 1.75;
                     if (this.canFly() && !(this.getVanillaType() == EntityType.SLIME)) d1 = 0.5;
 
                     Vector3d vector3d = this.getDeltaMovement();
@@ -908,7 +913,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     if (canFly()) isFlying = true;
                 } else if (this.onGround && this.getVanillaType() == EntityType.SLIME && (f != 0 || f1 != 0)){
                     if (slimeHopTimer >= 3){
-                        doSlimeJump((float) f1, 1);
+                        doSlimeJump((float) f1, 1, 1);
                         slimeHopTimer = 0;
                     }
                     slimeHopTimer++;
@@ -938,7 +943,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 this.flyingSpeed = 0.02F;
                 if (this.onGround && this.getVanillaType() == EntityType.SLIME && (travelVec.x != 0 || travelVec.z != 0)){
                     if (slimeHopTimer >= 5){
-                        doSlimeJump((float) travelVec.z, 0.25F);
+                        doSlimeJump((float) travelVec.z, 0.5,0.2F);
                         slimeHopTimer = 0;
                     }
                     slimeHopTimer++;
@@ -950,8 +955,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         }
     }
 
-    private void doSlimeJump(float f1, double force) {
-        double d1 = 0.8D;
+    private void doSlimeJump(float f1, double yScale, double force) {
+        double d1 = 0.8D * yScale;
         Vector3d vector3d = this.getDeltaMovement();
         this.setDeltaMovement(vector3d.x, d1, vector3d.z);
         this.setIsJumping(true);
@@ -1031,6 +1036,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
             if (!this.isBaby() && this.getVanillaType() == EntityType.FOX){
                 d0 -= 0.1F;
+            }
+
+            if (!this.isBaby() && this.getVanillaType() == EntityType.SLIME){
+                d0 -= 0.16F;
             }
 
             if (!this.isBaby() && this.getVanillaType() == EntityType.RAVAGER){
