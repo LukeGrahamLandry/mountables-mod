@@ -1,37 +1,62 @@
 package io.github.lukegrahamlandry.mountables.client;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
+import io.github.lukegrahamlandry.mountables.client.models.*;
 import io.github.lukegrahamlandry.mountables.client.render.GenericMountRenderer;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
-import net.minecraft.client.renderer.entity.CowRenderer;
-import net.minecraft.client.renderer.entity.PigRenderer;
-import net.minecraft.client.renderer.entity.SheepRenderer;
-import net.minecraft.client.renderer.entity.model.EntityModel;
+import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
+import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.CowEntity;
-import net.minecraft.entity.passive.PigEntity;
-import net.minecraft.entity.passive.SheepEntity;
-import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Supplier;
 
+@OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = MountablesMain.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class RenderHandler {
+    static Map<EntityType, Supplier<? extends EntityModel>> mountModels = new HashMap<>();
+    static {
+        mountModels.put(EntityType.SHEEP, SheepMountModel::new);
+        mountModels.put(EntityType.PIG, PigModel::new);
+        mountModels.put(EntityType.COW, CowModel::new);
+        mountModels.put(EntityType.SNOW_GOLEM, SnowManModel::new);
+        mountModels.put(EntityType.CHICKEN, ChickenModel::new);
+        mountModels.put(EntityType.SPIDER, SpiderModel::new);
+        mountModels.put(EntityType.CREEPER, CreeperModel::new);
+        mountModels.put(EntityType.WOLF, WolfMountModel::new);
+        mountModels.put(EntityType.CAT, () -> new OcelotModel<MountEntity>(0.0F));
+        mountModels.put(EntityType.LLAMA, LlamaMountModel::new);
+        mountModels.put(EntityType.FOX, FoxMountModel::new);
+        mountModels.put(EntityType.PANDA, PandaMountModel::new);
+        mountModels.put(EntityType.ZOMBIE, ZombieMountModel::new);
+        mountModels.put(EntityType.SKELETON, SkeletonMountModel::new);
+        mountModels.put(EntityType.PHANTOM, PhantomModel::new);
+        mountModels.put(EntityType.BEE, BeeMountModel::new);
+        mountModels.put(EntityType.GHAST, GhastModel::new);
+        mountModels.put(EntityType.WITHER, WitherMountModel::new);
+        mountModels.put(EntityType.HOGLIN, HogMountModel::new);
+        mountModels.put(EntityType.RAVAGER, RavagerMountModel::new);
+        mountModels.put(EntityType.TURTLE, TurtleMountModel::new);
+        mountModels.put(EntityType.SQUID, SquidModel::new);
+        mountModels.put(EntityType.GUARDIAN, GuardianMountModel::new);
+        mountModels.put(EntityType.SLIME, () -> new SlimeModel<MountEntity>(16));
+        mountModels.put(EntityType.MAGMA_CUBE, MagmaMountModel::new);
+    }
+
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
-        for (EntityType vanillaType : MountTypes.getMountTypes()){
+        for (EntityType vanillaType : mountModels.keySet()){
             MountTypes.MountTypeData thing = MountTypes.get(vanillaType);
             RenderingRegistry.registerEntityRenderingHandler(thing.getType(), (manager) -> {
-                return new GenericMountRenderer<>(manager, vanillaType, thing.textureLocation, thing.modelFactory);
+                return new GenericMountRenderer<>(manager, vanillaType, thing.textureLocation, mountModels.get(vanillaType));
             });
         }
     }
