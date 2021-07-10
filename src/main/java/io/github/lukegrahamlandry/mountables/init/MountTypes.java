@@ -73,7 +73,7 @@ public class MountTypes {
         create(EntityType.FOX, Items.SWEET_BERRIES, "textures/entity/fox/fox.png");
         create(EntityType.PANDA, Items.BAMBOO, "textures/entity/panda/panda.png");
         create(EntityType.ZOMBIE, Items.ROTTEN_FLESH, "textures/entity/zombie/zombie.png");
-        create(EntityType.SKELETON, Items.BONE_MEAL, "textures/entity/skeleton/skeleton.png");
+        create(EntityType.SKELETON, Items.ARROW, "textures/entity/skeleton/skeleton.png");
         create(EntityType.PHANTOM, Items.PHANTOM_MEMBRANE, "textures/entity/phantom.png");
         create(EntityType.BEE, Items.HONEYCOMB, "textures/entity/bee/bee.png");
         create(EntityType.GHAST, Items.GHAST_TEAR, "textures/entity/ghast/ghast.png");

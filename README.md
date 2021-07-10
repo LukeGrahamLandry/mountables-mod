@@ -17,19 +17,19 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - sheep (mutton): dye or wool, shears, nether star for jeb effect
     - chicken (chicken)
     - spider (string): spiders eye for cave spider, string to revert
-    - creeper (gunpowder)
+    - creeper (gunpowder): redstone block for charged, gunpowder to revert
     - slime (slime ball): has bouncy movement. magma cream for magma cube texture, slime ball reverts it
     - ghast (ghast tear)
-    - wolf (bone)
+    - wolf (bone): dye sets collar color
     - cat (cod): cod cycles texture
     - squid (ink sac): glowstone block for glow squid, ink sac to revert
     - fox (sweet berry): snowball for arctic texture, spruce log to revert
     - wither (soul sand)
     - bee (honey comb)
-    - llama (wheat): wheat cycles texture
+    - llama (wheat): wheat cycles texture, dye sets carpet color
     - panda (bamboo): bamboo cycles textures
     - zombie (rotten flesh): sand for husk, water bucket for drowned, flesh reverts it
-    - skeleton (bone meal): coal for wither, snow ball for stray, bone reverts it
+    - skeleton (arrow): coal for wither, snow ball for stray, bone reverts it
     - guardian (prismarine shard): cooked cod for elder, prismarine shard reverts it
     - ravager (leather)
     - hoglin (cooked pork): rotten flesh for zoglin, pork to revert

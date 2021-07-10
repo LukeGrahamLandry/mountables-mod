@@ -33,7 +33,7 @@ public abstract class CraftSlotMixin {
         if (resultInv.getItem(0).getItem() == ItemInit.MOUNT_SUMMON.get()){
             EntityType type = MountTypes.getToCraft(craftInv.getItem(0).getItem());
             if (type == null) return;
-            MountSummonItem.writeNBT(resultInv.getItem(0), type, 0, MountEntity.maxHealth, MountSummonItem.canFlyByDefault(type), false);
+            MountSummonItem.writeNBT(resultInv.getItem(0), type, 0, MountEntity.maxHealth, MountSummonItem.canFlyByDefault(type), false, 0);
         }
     }
 

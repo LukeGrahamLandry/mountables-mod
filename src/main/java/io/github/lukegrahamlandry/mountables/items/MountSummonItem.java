@@ -1,6 +1,7 @@
 package io.github.lukegrahamlandry.mountables.items;
 
 import io.github.lukegrahamlandry.mountables.config.MountsConfig;
+import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.block.BlockState;
@@ -11,9 +12,14 @@ import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.potion.Potions;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -43,7 +49,7 @@ public class MountSummonItem extends Item {
         return EntityType.byString(typeName).orElse(null);
     }
 
-    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby){
+    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby, int color){
         CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
         // MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
         tag.putString("typeid", EntityType.getKey(type).toString());
@@ -51,6 +57,7 @@ public class MountSummonItem extends Item {
         tag.putInt("health", health);
         tag.putBoolean("canfly", flight);
         tag.putBoolean("baby", baby);
+        tag.putInt("colortype", color);
         stack.setTag(tag);
     }
 
@@ -111,11 +118,23 @@ public class MountSummonItem extends Item {
 
         // MountablesMain.LOGGER.debug(type);
 
-        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false);
+        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0);
     }
 
     public static boolean canFlyByDefault(EntityType type) {
         if (!MountsConfig.doSomeStartWithFlight()) return false;
         return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM;
+    }
+
+    public void fillItemCategory(ItemGroup p_150895_1_, NonNullList<ItemStack> p_150895_2_) {
+        if (this.allowdedIn(p_150895_1_)) {
+            for (EntityType vanillaType : MountTypes.getMountTypes()){
+                if (vanillaType == EntityType.MAGMA_CUBE) continue; // ugly hack because magma cream is acutally a texture of slime but needs a different model
+
+                ItemStack stack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
+                MountSummonItem.writeNBT(stack, vanillaType, 0, MountEntity.maxHealth, canFlyByDefault(vanillaType), false, 0);
+                p_150895_2_.add(stack);
+            }
+        }
     }
 }

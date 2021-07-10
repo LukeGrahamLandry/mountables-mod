@@ -1,4 +1,6 @@
 {
   "item.mountables.mount_core": "Mountable Core",
-  "item.mountables.mount_summon": "Mountable"
+  "item.mountables.mount_summon": "Mountable",
+
+  "itemGroup.mountables": "Mountables"
 }

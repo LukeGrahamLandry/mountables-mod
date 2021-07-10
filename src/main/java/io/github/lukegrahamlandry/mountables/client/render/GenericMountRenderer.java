@@ -2,19 +2,14 @@ package io.github.lukegrahamlandry.mountables.client.render;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lukegrahamlandry.mountables.MountablesMain;
-import io.github.lukegrahamlandry.mountables.client.models.SheepMountModel;
-import io.github.lukegrahamlandry.mountables.client.models.SkeletonMountModel;
-import io.github.lukegrahamlandry.mountables.client.models.ZombieMountModel;
+import io.github.lukegrahamlandry.mountables.client.models.*;
 import io.github.lukegrahamlandry.mountables.client.render.layer.*;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.MobRenderer;
-import net.minecraft.client.renderer.entity.layers.DrownedOuterLayer;
-import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.layers.PhantomEyesLayer;
-import net.minecraft.client.renderer.entity.layers.SlimeGelLayer;
+import net.minecraft.client.renderer.entity.layers.*;
 import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.monster.GhastEntity;
@@ -39,6 +34,9 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (vanillaType == EntityType.SKELETON) this.addLayer((LayerRenderer<MountEntity, M>) new StrayLayer((IEntityRenderer<MountEntity, SkeletonMountModel>) this));
         if (vanillaType == EntityType.PHANTOM) this.addLayer((LayerRenderer<MountEntity, M>) new PhantomEyesLayer<>((IEntityRenderer<MountEntity, PhantomModel<MountEntity>>) this));
         if (vanillaType == EntityType.SLIME) this.addLayer((LayerRenderer<MountEntity, M>) new SlimeGelLayer(this));
+        if (vanillaType == EntityType.LLAMA) this.addLayer((LayerRenderer<MountEntity, M>) new LlamaCarpetLayer((IEntityRenderer<MountEntity, LlamaMountModel>) this));
+        if (vanillaType == EntityType.CREEPER) this.addLayer((LayerRenderer<MountEntity, M>) new ChargedCreeperLayer((IEntityRenderer<MountEntity, CreeperModel<MountEntity>>) this));;
+        if (vanillaType == EntityType.WOLF) this.addLayer((LayerRenderer<MountEntity, M>) new CollarLayer((IEntityRenderer<MountEntity, WolfMountModel>) this));
     }
 
     @Override

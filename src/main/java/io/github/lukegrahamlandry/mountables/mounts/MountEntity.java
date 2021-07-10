@@ -44,6 +44,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Boolean> CAN_FLY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> IS_BABY = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.defineId(MountEntity.class, DataSerializers.OPTIONAL_UUID);
+    private static final DataParameter<Integer> COLOR = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
+
     public static final int maxHealth = 20;
 
     private ItemStack summonStack;
@@ -64,6 +66,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.entityData.set(VANILLA_TYPE, EntityType.getKey(this.vanillaType).toString());
         this.entityData.set(CAN_FLY, stack.getTag().getBoolean("canfly"));
         this.setChild(stack.getTag().getBoolean("baby"));
+        int color = stack.getTag().getInt("colortype");
+        this.setColorType(color);
     }
 
     @Override
@@ -96,7 +100,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     public void die(DamageSource source) {
         super.die(source);
         if (!level.isClientSide()){
-            MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 2, this.canFly(), this.isBaby());
+            MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 2, this.canFly(), this.isBaby(), this.getColorType());
             this.spawnAtLocation(summonStack);
         }
     }
@@ -119,38 +123,14 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
         ItemStack itemstack = player.getItemInHand(hand);
         if (!itemstack.isEmpty()) {
-            boolean textureSuccess = false;
-            if (this.vanillaType == EntityType.SHEEP) textureSuccess = updateSheepTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.COW) textureSuccess = updateCowTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.PIG) textureSuccess = updatePigTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.SNOW_GOLEM) textureSuccess = updateSnowmanTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.SPIDER) textureSuccess = updateSpiderTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.CAT && itemstack.getItem() == Items.COD){
-                this.setTextureType((this.getTextureType() + 1) % (CatEntity.TEXTURE_BY_TYPE.size() + 1));
-                textureSuccess = true;
-            }
-            if (this.vanillaType == EntityType.CAT && itemstack.getItem() == Items.WHEAT){
-                this.setTextureType((this.getTextureType() + 1) % 4);
-                textureSuccess = true;
-            }
-            if (this.vanillaType == EntityType.FOX) textureSuccess = updateFoxTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.LLAMA && itemstack.getItem() == Items.WHEAT){
-                this.setTextureType((this.getTextureType() + 1) % 4);
-                textureSuccess = true;
-            }
-            if (this.vanillaType == EntityType.PANDA && itemstack.getItem() == Items.BAMBOO){
-                this.setTextureType((this.getTextureType() + 1) % 7);
-                textureSuccess = true;
-            }
-            if (this.vanillaType == EntityType.ZOMBIE) textureSuccess = updateZombieTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.SKELETON) textureSuccess = updateSkeletonTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.HOGLIN) textureSuccess = updateHogTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.SQUID) textureSuccess = updateSquidTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.GUARDIAN) textureSuccess = updateGuardianTexture(itemstack.getItem());
-            if (this.vanillaType == EntityType.SLIME) textureSuccess = updateSlimeTexture(itemstack.getItem());
+            boolean textureSuccess = MountTextureUtil.tryUpdateTexture(this, itemstack);
+            if (!textureSuccess) textureSuccess = MountTextureUtil.tryUpdateColor(this, itemstack);;
+
             if (itemstack.getItem() == MountsConfig.getFlightItem()) {
-                textureSuccess = true;
                 this.entityData.set(CAN_FLY, true);
+                itemstack.shrink(1);
+                if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
+                return ActionResultType.sidedSuccess(this.level.isClientSide);
             }
             if (textureSuccess){
                 if (MountsConfig.doesTextureSwapConsume()){
@@ -199,7 +179,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         if (player.isShiftKeyDown() && isOwner(player) && player.getItemInHand(hand).isEmpty() && hand == Hand.MAIN_HAND){
             if (!level.isClientSide()){
                 // crashes on client if loaded from nbt because stack is null
-                MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby());
+                MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType());
                 player.setItemInHand(hand, this.summonStack);
             }
             this.remove();
@@ -245,6 +225,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(TEXTURE, 0);
+        this.entityData.define(COLOR, 0);
         this.entityData.define(VANILLA_TYPE, "");
         this.entityData.define(CAN_FLY, false);
         this.entityData.define(IS_BABY, false);
@@ -259,6 +240,14 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return this.entityData.get(TEXTURE);
     }
 
+    public void setColorType(int x){
+        this.entityData.set(COLOR, x);
+    }
+
+    public int getColorType(){
+        return this.entityData.get(COLOR);
+    }
+
     public EntityType getVanillaType() {
         return EntityType.byString(this.entityData.get(VANILLA_TYPE)).orElse(EntityType.CREEPER);
     }
@@ -268,7 +257,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         super.addAdditionalSaveData(nbt);
         this.summonStack.getTag().putInt("health", (int) this.getHealth());
         this.summonStack.getTag().putInt("texturetype", this.getTextureType());
-        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby());
+        this.summonStack.getTag().putInt("colortype", this.getColorType());
+        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType());
         nbt.put("summon", this.summonStack.getTag());
         nbt.putUUID("owner", getOwnerUUID());
     }
@@ -317,170 +307,6 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Override
     public boolean canBreatheUnderwater() {
         return this.canBeRiddenInWater(null);
-    }
-
-    // *** TEXTURE TYPES BY ENTITY *** //
-
-    private static final Map<Item, DyeColor> woolBlocks = new HashMap<>();
-    static {
-        woolBlocks.put(Items.WHITE_WOOL, DyeColor.WHITE);
-        woolBlocks.put(Items.ORANGE_WOOL, DyeColor.ORANGE);
-        woolBlocks.put(Items.MAGENTA_WOOL, DyeColor.MAGENTA);
-        woolBlocks.put(Items.LIGHT_BLUE_WOOL, DyeColor.LIGHT_BLUE);
-        woolBlocks.put(Items.YELLOW_WOOL, DyeColor.YELLOW);
-        woolBlocks.put(Items.LIME_WOOL, DyeColor.LIME);
-        woolBlocks.put(Items.PINK_WOOL, DyeColor.PINK);
-        woolBlocks.put(Items.GRAY_WOOL, DyeColor.GRAY);
-        woolBlocks.put(Items.LIGHT_GRAY_WOOL, DyeColor.LIGHT_GRAY);
-        woolBlocks.put(Items.CYAN_WOOL, DyeColor.CYAN);
-        woolBlocks.put(Items.PURPLE_WOOL, DyeColor.PURPLE);
-        woolBlocks.put(Items.BLUE_WOOL, DyeColor.BLUE);
-        woolBlocks.put(Items.BROWN_WOOL, DyeColor.BROWN);
-        woolBlocks.put(Items.GREEN_WOOL, DyeColor.GREEN);
-        woolBlocks.put(Items.RED_WOOL, DyeColor.RED);
-        woolBlocks.put(Items.BLACK_WOOL, DyeColor.BLACK);
-    }
-
-    private boolean updateSheepTexture(Item item){
-        if (item instanceof DyeItem){
-            this.setTextureType(((DyeItem)item).getDyeColor().getId());
-        } else if (item == Items.SHEARS){
-            this.setTextureType(17);
-        } else if (item == Items.NETHER_STAR){
-            this.setTextureType(16);
-        } else if (woolBlocks.containsKey(item)) {
-            this.setTextureType(woolBlocks.get(item).getId());
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateCowTexture(Item item){
-        if (item == Items.RED_MUSHROOM){
-            this.setTextureType(1);
-        } else if (item == Items.BROWN_MUSHROOM){
-            this.setTextureType(2);
-        } else if (item == Items.SHEARS){
-            this.setTextureType(0);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updatePigTexture(Item item){
-        if (item == Items.GLOWSTONE_DUST){
-            this.setTextureType(1);
-        } else if (item == Items.CARROT){
-            this.setTextureType(0);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateSnowmanTexture(Item item){
-        if (item == Items.CARVED_PUMPKIN){
-            this.setTextureType(0);
-        } else if (item == Items.SHEARS){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateSpiderTexture(Item item){
-        if (item == Items.STRING){
-            this.setTextureType(0);
-        } else if (item == Items.SPIDER_EYE){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateFoxTexture(Item item){
-        if (item == Items.SPRUCE_LOG){
-            this.setTextureType(0);
-        } else if (item == Items.SNOWBALL){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateZombieTexture(Item item){
-        if (item == Items.ROTTEN_FLESH){
-            this.setTextureType(0);
-        } else if (item == Items.SAND){
-            this.setTextureType(1);
-        } else if (item == Items.WATER_BUCKET){
-            this.setTextureType(2);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateSkeletonTexture(Item item){
-        if (item == Items.BONE){
-            this.setTextureType(0);
-        } else if (item == Items.COAL){
-            this.setTextureType(1);
-        } else if (item == Items.SNOWBALL){
-            this.setTextureType(2);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateHogTexture(Item item){
-        if (item == Items.PORKCHOP){
-            this.setTextureType(0);
-        } else if (item == Items.ROTTEN_FLESH){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateSquidTexture(Item item){
-        if (item == Items.INK_SAC){
-            this.setTextureType(0);
-        } else if (item == Items.GLOWSTONE){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateGuardianTexture(Item item){
-        if (item == Items.PRISMARINE_SHARD){
-            this.setTextureType(0);
-        } else if (item == Items.COOKED_COD){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean updateSlimeTexture(Item item){
-        if (item == Items.SLIME_BALL){
-            this.setTextureType(0);
-        } else if (item == Items.MAGMA_CREAM){
-            this.setTextureType(1);
-        } else {
-            return false;
-        }
-        return true;
     }
 
     public EntityType<?> getType() {
