@@ -107,7 +107,11 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/glow_squid.png");
         } else if (mount.getVanillaType() == EntityType.GUARDIAN && mount.getTextureType() == 1){
             return new ResourceLocation("textures/entity/guardian_elder.png");
-        } 
+        } else if (mount.getVanillaType() == EntityType.STRIDER && mount.getTextureType() == 1){
+            return new ResourceLocation("textures/entity/strider/strider_cold.png");
+        }else if (mount.getVanillaType() == EntityType.SILVERFISH && mount.getTextureType() == 1){
+            return new ResourceLocation("textures/entity/endermite.png");
+        }
 
         return TEXTURE_LOCATION;
     }

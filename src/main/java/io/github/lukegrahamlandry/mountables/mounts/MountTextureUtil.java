@@ -68,6 +68,14 @@ public class MountTextureUtil {
             if (itemstack.getItem() == Items.REDSTONE_BLOCK) newTexture = 1;
             else if (itemstack.getItem() == Items.GUNPOWDER) newTexture = 0;
         }
+        if (vanillaType == EntityType.STRIDER) {
+            if (itemstack.getItem() == Items.ICE) newTexture = 1;
+            else if (itemstack.getItem() == Items.LAVA_BUCKET) newTexture = 0;
+        }
+        if (vanillaType == EntityType.ENDERMITE) {
+            if (itemstack.getItem() == Items.ENDER_PEARL) newTexture = 1;
+            else if (itemstack.getItem() == Items.STONE) newTexture = 0;
+        }
         
         
         if (newTexture != -1) mount.setTextureType(newTexture);

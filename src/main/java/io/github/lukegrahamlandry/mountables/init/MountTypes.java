@@ -85,5 +85,7 @@ public class MountTypes {
         create(EntityType.GUARDIAN, Items.PRISMARINE_SHARD, "textures/entity/guardian.png");
         create(EntityType.SLIME, Items.SLIME_BALL,  "textures/entity/slime/slime.png");
         create(EntityType.MAGMA_CUBE, Items.BEDROCK,  "textures/entity/slime/magmacube.png");
+        create(EntityType.SILVERFISH, Items.STONE,  "textures/entity/silverfish.png");
+        create(EntityType.STRIDER, Items.BASALT,  "textures/entity/strider/strider.png");
     }
 }

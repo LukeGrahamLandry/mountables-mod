@@ -49,6 +49,8 @@ public class RenderHandler {
         mountModels.put(EntityType.GUARDIAN, GuardianMountModel::new);
         mountModels.put(EntityType.SLIME, () -> new SlimeModel<MountEntity>(16));
         mountModels.put(EntityType.MAGMA_CUBE, MagmaMountModel::new);
+        mountModels.put(EntityType.SILVERFISH, SilverfishModel::new);
+        mountModels.put(EntityType.STRIDER, StriderMountModel::new);
     }
 
     @SubscribeEvent
