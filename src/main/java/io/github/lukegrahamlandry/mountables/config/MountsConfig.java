@@ -16,7 +16,8 @@ public class MountsConfig {
     private static ForgeConfigSpec.BooleanValue allowMountFlight;
     private static ForgeConfigSpec.BooleanValue textureSwapConsumesItem;
     private static ForgeConfigSpec.BooleanValue someStartWithFlight;
-    private static ForgeConfigSpec.ConfigValue<String> flightUpgradeItem;
+    private static ForgeConfigSpec.DoubleValue walkingSpeedCoreBoost;
+    private static ForgeConfigSpec.DoubleValue flyingSpeedCoreBoost;
 
     static {
         final ForgeConfigSpec.Builder serverBuilder = new ForgeConfigSpec.Builder();
@@ -30,12 +31,15 @@ public class MountsConfig {
         allowMountFlight = serverBuilder
                 .comment("Whether mounts should ever be able to fly: ")
                 .define("allowMountFlight", true);
-        flightUpgradeItem = serverBuilder
-                .comment("Right click a mount with this item to grant flight: ")
-                .define("flightUpgradeItem", "minecraft:feather");
         someStartWithFlight = serverBuilder
                 .comment("Whether ghast/wither/bee/phantom mounts should be able to fly without being upgraded: ")
                 .define("someStartWithFlight", true);
+        walkingSpeedCoreBoost = serverBuilder
+                .comment("How much faster each speed core should make it (while walking): ")
+                .defineInRange("walkingSpeedCoreBoost", 0.1D, 0, 999);
+        flyingSpeedCoreBoost = serverBuilder
+                .comment("How much faster each speed core should make it (while flyinh): ")
+                .defineInRange("flyingSpeedCoreBoost", 0.05D, 0, 999);
 
         server_config = serverBuilder.build();
     }
@@ -52,8 +56,12 @@ public class MountsConfig {
         return textureSwapConsumesItem.get();
     }
 
-    public static Item getFlightItem(){
-        return ForgeRegistries.ITEMS.getValue(new ResourceLocation(flightUpgradeItem.get()));
+    public static float getWalkingSpeedPerCore() {
+        return walkingSpeedCoreBoost.get().floatValue();
+    }
+
+    public static float getFlyingSpeedPerCore() {
+        return flyingSpeedCoreBoost.get().floatValue();
     }
 
     public static void loadConfig(ForgeConfigSpec config, String path){
@@ -61,4 +69,6 @@ public class MountsConfig {
         file.load();
         config.setConfig(file);
     }
+
+
 }

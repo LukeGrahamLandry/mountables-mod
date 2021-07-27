@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iai",
+    "aca",
+    "iai"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:netherite_ingot"
+    },
+    "a": {
+      "item": "minecraft:gold_ingot"
+    },
+    "c": {
+      "item": "minecraft:mount_core"
+    }
+  },
+  "result": {
+    "item": "mountables:fire_core"
+  }
+}

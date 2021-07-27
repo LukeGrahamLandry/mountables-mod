@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iai",
+    "aca",
+    "iai"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:redstone"
+    },
+    "a": {
+      "item": "minecraft:feather"
+    },
+    "c": {
+      "item": "minecraft:mount_core"
+    }
+  },
+  "result": {
+    "item": "mountables:flight_core"
+  }
+}

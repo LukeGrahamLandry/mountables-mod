@@ -46,6 +46,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Optional<UUID>> OWNER = EntityDataManager.defineId(MountEntity.class, DataSerializers.OPTIONAL_UUID);
     private static final DataParameter<Integer> COLOR = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
 
+    private static final DataParameter<Boolean> HAS_FIRE_CORE = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> HAS_WATER_CORE = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Integer> SPEED_CORES = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
+
     public static final int maxHealth = 20;
 
     private ItemStack summonStack;
@@ -100,9 +104,14 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     public void die(DamageSource source) {
         super.die(source);
         if (!level.isClientSide()){
-            MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), 2, this.canFly(), this.isBaby(), this.getColorType());
+            this.summonStack = writeToStack();
             this.spawnAtLocation(summonStack);
         }
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return this.entityData.get(HAS_FIRE_CORE);
     }
 
     @Override
@@ -124,14 +133,47 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         ItemStack itemstack = player.getItemInHand(hand);
         if (!itemstack.isEmpty()) {
             boolean textureSuccess = MountTextureUtil.tryUpdateTexture(this, itemstack);
-            if (!textureSuccess) textureSuccess = MountTextureUtil.tryUpdateColor(this, itemstack);;
+            if (!textureSuccess) textureSuccess = MountTextureUtil.tryUpdateColor(this, itemstack);
 
-            if (itemstack.getItem() == MountsConfig.getFlightItem()) {
-                this.entityData.set(CAN_FLY, true);
-                itemstack.shrink(1);
-                if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
-                return ActionResultType.sidedSuccess(this.level.isClientSide);
+            if (!textureSuccess){
+                boolean coreSuccess = false;
+                if (itemstack.getItem() == ItemInit.FLIGHT_CORE.get()) {
+                    this.entityData.set(CAN_FLY, true);
+                    coreSuccess = true;
+                }
+                if (itemstack.getItem() == ItemInit.FIRE_CORE.get()) {
+                    this.entityData.set(HAS_FIRE_CORE, true);
+                    coreSuccess = true;
+                }
+                if (itemstack.getItem() == ItemInit.WATER_CORE.get()) {
+                    this.entityData.set(HAS_WATER_CORE, true);
+                    coreSuccess = true;
+                }
+                if (itemstack.getItem() == ItemInit.SPEED_CORE.get()) {
+                    this.entityData.set(SPEED_CORES, this.entityData.get(SPEED_CORES) + 1);
+                    coreSuccess = true;
+                }
+                if (itemstack.getItem() == ItemInit.SLOW_CORE.get()) {
+                    this.entityData.set(SPEED_CORES, this.entityData.get(SPEED_CORES) - 1);
+                    coreSuccess = true;
+                }
+                if (itemstack.getItem() == ItemInit.RESET_CORE.get()) {
+                    if (!MountSummonItem.canFlyByDefault(this.getVanillaType())){
+                        this.entityData.set(CAN_FLY, false);
+                    }
+                    this.entityData.set(HAS_WATER_CORE, false);
+                    this.entityData.set(HAS_FIRE_CORE, false);
+                    this.entityData.set(SPEED_CORES, 0);
+                    coreSuccess = true;
+                }
+
+                if (coreSuccess){
+                    itemstack.shrink(1);
+                    if (!level.isClientSide()) doParticles(ParticleTypes.HAPPY_VILLAGER);
+                    return ActionResultType.sidedSuccess(this.level.isClientSide);
+                }
             }
+
             if (textureSuccess){
                 if (MountsConfig.doesTextureSwapConsume()){
                     if (itemstack.getItem() == Items.WATER_BUCKET) player.setItemInHand(hand, new ItemStack(Items.BUCKET));
@@ -179,7 +221,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         if (player.isShiftKeyDown() && isOwner(player) && player.getItemInHand(hand).isEmpty() && hand == Hand.MAIN_HAND){
             if (!level.isClientSide()){
                 // crashes on client if loaded from nbt because stack is null
-                MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType());
+                this.summonStack = this.writeToStack();
                 player.setItemInHand(hand, this.summonStack);
             }
             this.remove();
@@ -230,6 +272,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.entityData.define(CAN_FLY, false);
         this.entityData.define(IS_BABY, false);
         this.entityData.define(OWNER, Optional.empty());
+
+        this.entityData.define(HAS_WATER_CORE, false);
+        this.entityData.define(HAS_FIRE_CORE, false);
+        this.entityData.define(SPEED_CORES, 0);
     }
 
     public void setTextureType(int x){
@@ -255,12 +301,15 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Override
     public void addAdditionalSaveData(CompoundNBT nbt) {
         super.addAdditionalSaveData(nbt);
-        this.summonStack.getTag().putInt("health", (int) this.getHealth());
-        this.summonStack.getTag().putInt("texturetype", this.getTextureType());
-        this.summonStack.getTag().putInt("colortype", this.getColorType());
-        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType());
+        this.summonStack = writeToStack();
         nbt.put("summon", this.summonStack.getTag());
         nbt.putUUID("owner", getOwnerUUID());
+    }
+
+    public ItemStack writeToStack(){
+        if (this.summonStack == null) this.summonStack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
+        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType(), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(SPEED_CORES));
+        return this.summonStack;
     }
 
     @Override
@@ -301,7 +350,11 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     @Override
     public boolean canBeRiddenInWater(Entity rider) {
-        return this.getVanillaType() == EntityType.SQUID || this.getVanillaType() == EntityType.TURTLE || this.getVanillaType() == EntityType.GUARDIAN;
+        return this.entityData.get(HAS_WATER_CORE) || (this.getVanillaType() == EntityType.SQUID || this.getVanillaType() == EntityType.TURTLE || this.getVanillaType() == EntityType.GUARDIAN);
+    }
+
+    public boolean isSlowOnLand() {
+        return !this.entityData.get(HAS_WATER_CORE) && (this.getVanillaType() == EntityType.SQUID || this.getVanillaType() == EntityType.TURTLE || this.getVanillaType() == EntityType.GUARDIAN);
     }
 
     @Override
@@ -626,7 +679,6 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     boolean isFlying = false;
-    final double flightSpeed = 0.25D;
     int slimeHopTimer = 10;
     public void travel(Vector3d travelVec) {
         if (this.isAlive()) {
@@ -654,21 +706,21 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     boolean downSolid = !(downState.isAir() || (this.canBeRiddenInWater(null) && downState.is(Blocks.WATER)));  // !isAir should be isSolid
 
                     if (rider.zza > 0) {
-                        moveForward = flightSpeed;
+                        moveForward = this.getFlyingSpeed();
                         this.xRot = -MathHelper.clamp(rider.xRot, -10, 10);
                         this.setRot(this.yRot, this.xRot);
                         if (rider.xRot < -10 || rider.xRot > 10) {
-                            yComponent = -(Math.toRadians(rider.xRot) * flightSpeed);
+                            yComponent = -(Math.toRadians(rider.xRot) * this.getFlyingSpeed());
                             if (!isFlying && yComponent > 0) isFlying = true;  // that makes no sense?
                             else if (isFlying && yComponent < 0 && downSolid)
                                 isFlying = false;
                         }
                     } else if (rider.zza < 0) {
-                        moveForward = -flightSpeed;
+                        moveForward = -this.getFlyingSpeed();
                         this.xRot = -MathHelper.clamp(rider.xRot, -10, 10);
                         this.setRot(this.yRot, this.xRot);
                         if (rider.xRot < -10 || rider.xRot > 10) {
-                            yComponent = (Math.toRadians(rider.xRot) * flightSpeed);
+                            yComponent = (Math.toRadians(rider.xRot) * this.getFlyingSpeed());
                             if (!isFlying && yComponent > 0) isFlying = true;
                             else if (isFlying && yComponent < 0 && downSolid)
                                 isFlying = false;
@@ -676,9 +728,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     }
 
                     if (this.isControlledByLocalInstance()){
-                        this.flyingSpeed = (float) flightSpeed;
-                        // this.setSpeed((float) flightSpeed);
-                        super.travel(new Vector3d(rider.xxa * flightSpeed * 0.5F, yComponent, moveForward));
+                        this.flyingSpeed = (float) this.getFlyingSpeed();
+                        // this.setSpeed((float) this.getFlyingSpeed());
+                        super.travel(new Vector3d(rider.xxa * this.getFlyingSpeed() * 0.5F, yComponent, moveForward));
                     } else if (rider instanceof PlayerEntity) {
                         this.setDeltaMovement(Vector3d.ZERO);
                     }
@@ -747,7 +799,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
                 this.flyingSpeed = this.getSpeed() * 0.1F;
                 if (this.isControlledByLocalInstance()) {
-                    float speed = this.canBeRiddenInWater(null) ? 0.05F : (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+                    float speed = this.isSlowOnLand() ? 0.05F : this.getWalkingSpeed();
                     this.setSpeed(speed);
                     super.travel(new Vector3d((double)f, travelVec.y, (double)f1));
                 } else if (livingentity instanceof PlayerEntity) {
@@ -764,7 +816,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 // flight logic
                 if (livingentity.xRot < -25 && livingentity.zza > 0) isFlying = true;
             } else {
-                float speed = this.canBeRiddenInWater(null) ? 0.05F : (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+                float speed = this.isSlowOnLand() ? 0.05F : this.getWalkingSpeed();
                 this.setSpeed(speed);
                 this.flyingSpeed = 0.02F;
                 if (this.onGround && this.getVanillaType() == EntityType.SLIME && (travelVec.x != 0 || travelVec.z != 0)){
@@ -779,6 +831,16 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
 
         }
+    }
+
+    private float getWalkingSpeed() {
+        float speed = (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) + (this.entityData.get(SPEED_CORES) * MountsConfig.getWalkingSpeedPerCore());
+        return Math.max(speed, 0.025F);
+    }
+
+    private float getFlyingSpeed() {
+        float speed = 0.25F + (this.entityData.get(SPEED_CORES) * MountsConfig.getFlyingSpeedPerCore());
+        return Math.max(speed, 0.025F);
     }
 
     private void doSlimeJump(float f1, double yScale, double force) {

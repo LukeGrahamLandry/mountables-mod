@@ -50,7 +50,7 @@ public class MountSummonItem extends Item {
         return EntityType.byString(typeName).orElse(null);
     }
 
-    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby, int color){
+    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby, int color, boolean hasFireCore, boolean hasWaterCore, int speedCores){
         CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
         // MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
         tag.putString("typeid", EntityType.getKey(type).toString());
@@ -59,7 +59,15 @@ public class MountSummonItem extends Item {
         tag.putBoolean("canfly", flight);
         tag.putBoolean("baby", baby);
         tag.putInt("colortype", color);
+        tag.putBoolean("hasFireCore", hasFireCore);
+        tag.putBoolean("hasWaterCore", hasWaterCore);
+        tag.putInt("speedCores", speedCores);
         stack.setTag(tag);
+    }
+
+    public static ItemStack writeDefaultNBT(ItemStack stack, EntityType type){
+        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0, false, false, 0);
+        return stack;
     }
 
     public static int getItemColor(ItemStack stack, int tintIndex){
@@ -118,8 +126,7 @@ public class MountSummonItem extends Item {
         if (type == null) return;
 
         // MountablesMain.LOGGER.debug(type);
-
-        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0);
+        MountSummonItem.writeDefaultNBT(stack, type);
     }
 
     public static boolean canFlyByDefault(EntityType type) {
@@ -133,7 +140,7 @@ public class MountSummonItem extends Item {
                 if (vanillaType == EntityType.MAGMA_CUBE) continue; // ugly hack because magma cream is acutally a texture of slime but needs a different model
 
                 ItemStack stack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
-                MountSummonItem.writeNBT(stack, vanillaType, 0, MountEntity.maxHealth, canFlyByDefault(vanillaType), false, 0);
+                MountSummonItem.writeDefaultNBT(stack, vanillaType);
                 p_150895_2_.add(stack);
             }
         }

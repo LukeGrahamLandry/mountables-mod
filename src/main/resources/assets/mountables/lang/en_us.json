@@ -2,5 +2,12 @@
   "item.mountables.mount_core": "Mountable Core",
   "item.mountables.mount_summon": "Mountable",
 
+  "item.mountables.flight_core": "Flight Core",
+  "item.mountables.speed_core": "Speed Core",
+  "item.mountables.fire_core": "Netherite Core",
+  "item.mountables.water_core": "Prismarine Core",
+  "item.mountables.slow_core": "Slowness Core",
+  "item.mountables.reset_core": "Reset Core",
+
   "itemGroup.mountables": "Mountables"
 }

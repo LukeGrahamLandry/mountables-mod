@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "aca",
+    " a "
+  ],
+  "key": {
+    "a": {
+      "item": "minecraft:red_dye"
+    },
+    "c": {
+      "item": "minecraft:mount_core"
+    }
+  },
+  "result": {
+    "item": "mountables:reset_core"
+  }
+}
