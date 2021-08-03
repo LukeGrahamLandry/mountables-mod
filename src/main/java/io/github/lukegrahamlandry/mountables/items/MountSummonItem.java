@@ -123,7 +123,7 @@ public class MountSummonItem extends Item {
 
         EntityType type = MountTypes.getToCraft(recipeItem);
 
-        if (type == null) return;
+        if (type == null || !MountsConfig.isMountAllowed(type)) return;
 
         // MountablesMain.LOGGER.debug(type);
         MountSummonItem.writeDefaultNBT(stack, type);

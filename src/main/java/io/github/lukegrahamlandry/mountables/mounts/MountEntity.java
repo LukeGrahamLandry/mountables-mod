@@ -10,7 +10,6 @@ import net.minecraft.block.SoundType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.SwimGoal;
-import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
@@ -33,8 +32,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
 
 import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -135,29 +132,39 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
             boolean textureSuccess = MountTextureUtil.tryUpdateTexture(this, itemstack);
             if (!textureSuccess) textureSuccess = MountTextureUtil.tryUpdateColor(this, itemstack);
 
-            if (!textureSuccess){
+            if (!textureSuccess && MountsConfig.isCoreAllowed(itemstack.getItem())){
                 boolean coreSuccess = false;
-                if (itemstack.getItem() == ItemInit.FLIGHT_CORE.get()) {
+                if (itemstack.getItem() == ItemInit.FLIGHT_CORE.get() && !this.entityData.get(CAN_FLY)) {
                     this.entityData.set(CAN_FLY, true);
                     coreSuccess = true;
                 }
-                if (itemstack.getItem() == ItemInit.FIRE_CORE.get()) {
+                if (itemstack.getItem() == ItemInit.FIRE_CORE.get() && !this.entityData.get(HAS_FIRE_CORE)) {
                     this.entityData.set(HAS_FIRE_CORE, true);
                     coreSuccess = true;
                 }
-                if (itemstack.getItem() == ItemInit.WATER_CORE.get()) {
+                if (itemstack.getItem() == ItemInit.WATER_CORE.get() && !this.entityData.get(HAS_WATER_CORE)) {
                     this.entityData.set(HAS_WATER_CORE, true);
                     coreSuccess = true;
                 }
-                if (itemstack.getItem() == ItemInit.SPEED_CORE.get()) {
-                    this.entityData.set(SPEED_CORES, this.entityData.get(SPEED_CORES) + 1);
+                int speedCores = this.entityData.get(SPEED_CORES);
+                if (itemstack.getItem() == ItemInit.SPEED_CORE.get() && speedCores < MountsConfig.getMaxSpeedCores()) {
+                    this.entityData.set(SPEED_CORES, speedCores + 1);
                     coreSuccess = true;
                 }
                 if (itemstack.getItem() == ItemInit.SLOW_CORE.get()) {
-                    this.entityData.set(SPEED_CORES, this.entityData.get(SPEED_CORES) - 1);
+                    this.entityData.set(SPEED_CORES, speedCores - 1);
                     coreSuccess = true;
                 }
                 if (itemstack.getItem() == ItemInit.RESET_CORE.get()) {
+                    if (MountsConfig.shouldResetReturnCores()){
+                        if (this.entityData.get(HAS_FIRE_CORE)) this.spawnAtLocation(new ItemStack(ItemInit.FIRE_CORE.get()));
+                        if (this.entityData.get(HAS_WATER_CORE)) this.spawnAtLocation(new ItemStack(ItemInit.WATER_CORE.get()));
+                        if (this.entityData.get(CAN_FLY) && !MountSummonItem.canFlyByDefault(this.getVanillaType())) this.spawnAtLocation(new ItemStack(ItemInit.FLIGHT_CORE.get()));
+                        if (this.entityData.get(SPEED_CORES) > 0) this.spawnAtLocation(new ItemStack(ItemInit.SPEED_CORE.get(), this.entityData.get(SPEED_CORES)));
+                        if (this.entityData.get(SPEED_CORES) < 0) this.spawnAtLocation(new ItemStack(ItemInit.SLOW_CORE.get(), this.entityData.get(SPEED_CORES) * -1));
+                    }
+
+
                     if (!MountSummonItem.canFlyByDefault(this.getVanillaType())){
                         this.entityData.set(CAN_FLY, false);
                     }
@@ -322,7 +329,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     }
 
     private boolean canFly() {
-        return this.entityData.get(CAN_FLY) && (this.level.isClientSide() || MountsConfig.isFlightAllowed());
+        return this.entityData.get(CAN_FLY);
     }
 
     public void setOwnerUUID(UUID id) {
@@ -833,6 +840,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         }
     }
 
+    // TODO: have seperate config valies for effectiveness of slow and speed. perhaps a 1/x type thing
     private float getWalkingSpeed() {
         float speed = (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) + (this.entityData.get(SPEED_CORES) * MountsConfig.getWalkingSpeedPerCore());
         return Math.max(speed, 0.025F);

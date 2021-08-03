@@ -1,6 +1,7 @@
 package io.github.lukegrahamlandry.mountables.mixin;
 
 import io.github.lukegrahamlandry.mountables.MountablesMain;
+import io.github.lukegrahamlandry.mountables.config.MountsConfig;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
@@ -32,7 +33,7 @@ public abstract class CraftSlotMixin {
     private static void slotChangedCraftingGrid(int p_217066_0_, World p_217066_1_, PlayerEntity p_217066_2_, CraftingInventory craftInv, CraftResultInventory resultInv, CallbackInfo ci) {
         if (resultInv.getItem(0).getItem() == ItemInit.MOUNT_SUMMON.get()){
             EntityType type = MountTypes.getToCraft(craftInv.getItem(0).getItem());
-            if (type == null) return;
+            if (type == null || !MountsConfig.isMountAllowed(type)) return;
             MountSummonItem.writeDefaultNBT(resultInv.getItem(0), type);
         }
     }
