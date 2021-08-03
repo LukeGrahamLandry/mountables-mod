@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables.client.render;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.client.models.*;
@@ -12,13 +13,11 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.layers.*;
 import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.monster.GhastEntity;
 import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.passive.PandaEntity;
-import net.minecraft.entity.passive.SquidEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends MobRenderer<MountEntity, M> {
@@ -72,6 +71,18 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         return mount.getVanillaType() == EntityType.SQUID ? (float) Math.PI / 2: super.getBob(mount, ticks);
     }
 
+
+    private static final ResourceLocation RABBIT_BROWN_LOCATION = new ResourceLocation("textures/entity/rabbit/brown.png");
+    private static final ResourceLocation RABBIT_WHITE_LOCATION = new ResourceLocation("textures/entity/rabbit/white.png");
+    private static final ResourceLocation RABBIT_BLACK_LOCATION = new ResourceLocation("textures/entity/rabbit/black.png");
+    private static final ResourceLocation RABBIT_GOLD_LOCATION = new ResourceLocation("textures/entity/rabbit/gold.png");
+    private static final ResourceLocation RABBIT_SALT_LOCATION = new ResourceLocation("textures/entity/rabbit/salt.png");
+    private static final ResourceLocation RABBIT_WHITE_SPLOTCHED_LOCATION = new ResourceLocation("textures/entity/rabbit/white_splotched.png");
+    private static final ResourceLocation RABBIT_TOAST_LOCATION = new ResourceLocation("textures/entity/rabbit/toast.png");
+    private static final ResourceLocation RABBIT_EVIL_LOCATION = new ResourceLocation("textures/entity/rabbit/caerbannog.png");
+
+    static final Map<EntityType<?>, ResourceLocation> piglinTextures = ImmutableMap.of(EntityType.PIGLIN, new ResourceLocation("textures/entity/piglin/piglin.png"), EntityType.ZOMBIFIED_PIGLIN, new ResourceLocation("textures/entity/piglin/zombified_piglin.png"), EntityType.PIGLIN_BRUTE, new ResourceLocation("textures/entity/piglin/piglin_brute.png"));
+
     public ResourceLocation getTextureLocation(MountEntity mount) {
         if (mount.getVanillaType() == EntityType.COW){
             if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/cow/red_mooshroom.png");
@@ -111,6 +122,17 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             return new ResourceLocation("textures/entity/strider/strider_cold.png");
         }else if (mount.getVanillaType() == EntityType.SILVERFISH && mount.getTextureType() == 1){
             return new ResourceLocation("textures/entity/endermite.png");
+        } else if (mount.getVanillaType() == EntityType.RABBIT) {
+            if (mount.getTextureType() == 1) return RABBIT_WHITE_LOCATION;
+            if (mount.getTextureType() == 2) return RABBIT_BLACK_LOCATION;
+            if (mount.getTextureType() == 3) return RABBIT_GOLD_LOCATION;
+            if (mount.getTextureType() == 4) return RABBIT_SALT_LOCATION;
+            if (mount.getTextureType() == 5) return RABBIT_WHITE_SPLOTCHED_LOCATION;
+            if (mount.getTextureType() == 6) return RABBIT_TOAST_LOCATION;
+            if (mount.getTextureType() == 7) return RABBIT_EVIL_LOCATION;
+        } else if (mount.getVanillaType() == EntityType.PIGLIN) {
+            if (mount.getTextureType() == 1) return piglinTextures.get(EntityType.ZOMBIFIED_PIGLIN);
+            if (mount.getTextureType() == 2) return piglinTextures.get(EntityType.PIGLIN_BRUTE);
         }
 
         return TEXTURE_LOCATION;

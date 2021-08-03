@@ -7,9 +7,9 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
 - right click item to summon
 - owner can shift right click with empty hand to retrieve mount or summon item is dropped on death
 - change texture of some mounts by using certain items on them
-- use a feather to grant flight (slimes get multi-jump instead), food to heal
+- craft cores and right click on the mount to upgrade, food to heal
 - mounts with a baby version can be toggled with milk
-- some mounts can swim but are slow on land
+- some mounts can swim but are slow on land (fixed with a Prismarine Core)
 - **Types**
     - snow golem (snowball): shears remove pumpkin, carved pumpkin reverts it
     - cow (beef): mushroom for mooshroom, shears to go back
@@ -35,6 +35,11 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - hoglin (cooked pork): rotten flesh for zoglin, pork to revert
     - phantom (phantom membrane)
     - turtle (scute)
+    - silverfish (stone): enderpearl for endermite, stone to revert
+    - strider (basalt): ice for cold, lava to revert
+    - iron golem (iron block)
+    - rabbit (raw rabbit): carrot cycles basic textures, bread for toast, iron sword for killer
+    - piglin (gold ingot): rotten flesh to zombify, golden axe for brute, gold ingot to revert
     
 ## Support the Developer
 - https://patreon.com/LukeGrahamLandry

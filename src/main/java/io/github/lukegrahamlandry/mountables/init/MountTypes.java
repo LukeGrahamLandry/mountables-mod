@@ -87,5 +87,9 @@ public class MountTypes {
         create(EntityType.MAGMA_CUBE, Items.BEDROCK,  "textures/entity/slime/magmacube.png");
         create(EntityType.SILVERFISH, Items.STONE,  "textures/entity/silverfish.png");
         create(EntityType.STRIDER, Items.BASALT,  "textures/entity/strider/strider.png");
+        create(EntityType.IRON_GOLEM, Items.IRON_BLOCK,  "textures/entity/iron_golem/iron_golem.png");
+        create(EntityType.RABBIT, Items.RABBIT,  "textures/entity/rabbit/brown.png");
+        create(EntityType.BLAZE, Items.BLAZE_ROD,  "textures/entity/blaze.png");
+        create(EntityType.PIGLIN, Items.GOLD_INGOT,  "textures/entity/piglin/piglin.png");
     }
 }

@@ -51,6 +51,10 @@ public class RenderHandler {
         mountModels.put(EntityType.MAGMA_CUBE, MagmaMountModel::new);
         mountModels.put(EntityType.SILVERFISH, SilverfishModel::new);
         mountModels.put(EntityType.STRIDER, StriderMountModel::new);
+        mountModels.put(EntityType.IRON_GOLEM, IronGolemMountModel::new);
+        mountModels.put(EntityType.RABBIT, RabbitMountModel::new);
+        mountModels.put(EntityType.BLAZE, BlazeModel::new);
+        mountModels.put(EntityType.PIGLIN, () -> new PiglinModel<>(0.0F, 64, 64));
     }
 
     @SubscribeEvent

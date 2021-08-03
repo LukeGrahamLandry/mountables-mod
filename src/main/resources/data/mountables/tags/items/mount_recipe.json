@@ -26,6 +26,11 @@
     "minecraft:prismarine_shard",
     "minecraft:slime_ball",
     "minecraft:stone",
-    "minecraft:basalt"
+    "minecraft:basalt",
+    "minecraft:iron_block",
+    "minecraft:blaze_rod",
+    "minecraft:iron_block",
+    "minecraft:rabbit",
+    "minecraft:gold_ingot"
   ]
 }

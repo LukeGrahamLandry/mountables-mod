@@ -37,6 +37,7 @@ public class MountTextureUtil {
 
 
     public static boolean tryUpdateTexture(MountEntity mount, ItemStack itemstack) {
+        int oldTexture = mount.getTextureType();
         int newTexture = -1;
         EntityType vanillaType = mount.getVanillaType();
         
@@ -76,14 +77,24 @@ public class MountTextureUtil {
             if (itemstack.getItem() == Items.ENDER_PEARL) newTexture = 1;
             else if (itemstack.getItem() == Items.STONE) newTexture = 0;
         }
-        
-        
+        if (vanillaType == EntityType.RABBIT) {
+            if (itemstack.getItem() == Items.CARROT) newTexture = ((mount.getTextureType() + 1) % 6);
+            else if (itemstack.getItem() == Items.BREAD) newTexture = 6;
+            else if (itemstack.getItem() == Items.IRON_SWORD) newTexture = 7;
+        }
+        if (vanillaType == EntityType.PIGLIN) {
+            if (itemstack.getItem() == Items.GOLD_INGOT) newTexture = 0;
+            else if (itemstack.getItem() == Items.ROTTEN_FLESH) newTexture = 1;
+            else if (itemstack.getItem() == Items.GOLDEN_AXE) newTexture = 2;
+        }
+
         if (newTexture != -1) mount.setTextureType(newTexture);
-        return newTexture != -1;
+        return newTexture != -1 && newTexture != oldTexture;
     }
 
     public static boolean tryUpdateColor(MountEntity mount, ItemStack itemstack) {
         int newColor = -1;
+        int oldColor = mount.getColorType();
         EntityType vanillaType = mount.getVanillaType();
 
         if (vanillaType == EntityType.LLAMA){
@@ -98,9 +109,8 @@ public class MountTextureUtil {
             if (itemstack.getItem() == Items.NETHER_STAR) newColor = 17;
         }
 
-
         if (newColor != -1) mount.setColorType(newColor);
-        return newColor != -1;
+        return newColor != -1 && newColor != oldColor;
     }
 
     private static int updateSheepTexture(Item item){
