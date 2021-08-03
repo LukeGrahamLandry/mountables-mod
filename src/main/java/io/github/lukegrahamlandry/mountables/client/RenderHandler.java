@@ -5,6 +5,7 @@ import io.github.lukegrahamlandry.mountables.client.models.*;
 import io.github.lukegrahamlandry.mountables.client.render.GenericMountRenderer;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
+import net.minecraft.client.renderer.entity.PillagerRenderer;
 import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -55,6 +56,9 @@ public class RenderHandler {
         mountModels.put(EntityType.RABBIT, RabbitMountModel::new);
         mountModels.put(EntityType.BLAZE, BlazeModel::new);
         mountModels.put(EntityType.PIGLIN, () -> new PiglinModel<>(0.0F, 64, 64));
+        mountModels.put(EntityType.COD, CodModel::new);
+        mountModels.put(EntityType.PILLAGER, IllagerMountModel::new);
+        mountModels.put(EntityType.ENDERMAN, () -> new EndermanModel<>(0));
     }
 
     @SubscribeEvent

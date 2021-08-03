@@ -36,7 +36,7 @@ public class MountsConfig {
                 .comment("Whether it should consume the item when you switch a mount's texture: ")
                 .define("textureSwapConsumesItem", true);
         someStartWithFlight = serverBuilder
-                .comment("Whether ghast/wither/bee/phantom mounts should be able to fly without being upgraded: ")
+                .comment("Whether ghast/wither/bee/phantom/blaze mounts should be able to fly without being upgraded: ")
                 .define("someStartWithFlight", true);
         walkingSpeedCoreBoost = serverBuilder
                 .comment("How much faster each speed core should make it (while walking): ")

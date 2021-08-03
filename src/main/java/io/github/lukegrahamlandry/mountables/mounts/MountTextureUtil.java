@@ -3,6 +3,8 @@ package io.github.lukegrahamlandry.mountables.mounts;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.item.*;
+import net.minecraft.potion.PotionUtils;
+import net.minecraft.potion.Potions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -86,6 +88,19 @@ public class MountTextureUtil {
             if (itemstack.getItem() == Items.GOLD_INGOT) newTexture = 0;
             else if (itemstack.getItem() == Items.ROTTEN_FLESH) newTexture = 1;
             else if (itemstack.getItem() == Items.GOLDEN_AXE) newTexture = 2;
+        }
+        if (vanillaType == EntityType.PILLAGER) {
+            if (itemstack.getItem() == Items.CROSSBOW) newTexture = 0;
+            else if (itemstack.getItem() == Items.IRON_AXE) newTexture = 1;
+            else if (itemstack.getItem() == Items.BOW) newTexture = 2;
+            else if (itemstack.getItem() == Items.EMERALD) newTexture = 3;
+            else if (itemstack.getItem() == Items.POTION && PotionUtils.getPotion(itemstack) == Potions.WATER) newTexture = 4;
+        }
+
+        if (vanillaType == EntityType.COD) {
+            if (itemstack.getItem() == Items.COD) newTexture = 0;
+            else if (itemstack.getItem() == Items.SALMON) newTexture = 1;
+            else if (itemstack.getItem() == Items.PUFFERFISH) newTexture = 2 + ((oldTexture + 1) % 3);
         }
 
         if (newTexture != -1) mount.setTextureType(newTexture);

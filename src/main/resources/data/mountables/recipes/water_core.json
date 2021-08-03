@@ -13,7 +13,7 @@
       "item": "minecraft:prismarine_crystals"
     },
     "c": {
-      "item": "minecraft:mount_core"
+      "item": "mountables:mount_core"
     }
   },
   "result": {

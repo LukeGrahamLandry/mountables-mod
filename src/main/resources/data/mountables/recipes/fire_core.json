@@ -13,7 +13,7 @@
       "item": "minecraft:gold_ingot"
     },
     "c": {
-      "item": "minecraft:mount_core"
+      "item": "mountables:mount_core"
     }
   },
   "result": {

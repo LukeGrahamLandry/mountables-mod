@@ -13,7 +13,7 @@
       "item": "minecraft:feather"
     },
     "c": {
-      "item": "minecraft:mount_core"
+      "item": "mountables:mount_core"
     }
   },
   "result": {

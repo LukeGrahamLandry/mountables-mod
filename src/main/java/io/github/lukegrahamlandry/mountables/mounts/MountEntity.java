@@ -157,7 +157,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 }
                 if (itemstack.getItem() == ItemInit.RESET_CORE.get()) {
                     if (MountsConfig.shouldResetReturnCores()){
-                        if (this.entityData.get(HAS_FIRE_CORE)) this.spawnAtLocation(new ItemStack(ItemInit.FIRE_CORE.get()));
+                        if (this.entityData.get(HAS_FIRE_CORE) && !MountSummonItem.fireProofByDefault(this.getVanillaType())) this.spawnAtLocation(new ItemStack(ItemInit.FIRE_CORE.get()));
                         if (this.entityData.get(HAS_WATER_CORE)) this.spawnAtLocation(new ItemStack(ItemInit.WATER_CORE.get()));
                         if (this.entityData.get(CAN_FLY) && !MountSummonItem.canFlyByDefault(this.getVanillaType())) this.spawnAtLocation(new ItemStack(ItemInit.FLIGHT_CORE.get()));
                         if (this.entityData.get(SPEED_CORES) > 0) this.spawnAtLocation(new ItemStack(ItemInit.SPEED_CORE.get(), this.entityData.get(SPEED_CORES)));

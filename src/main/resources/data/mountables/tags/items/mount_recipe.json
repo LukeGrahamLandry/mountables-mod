@@ -31,6 +31,9 @@
     "minecraft:blaze_rod",
     "minecraft:iron_block",
     "minecraft:rabbit",
-    "minecraft:gold_ingot"
+    "minecraft:gold_ingot",
+    "minecraft:cod",
+    "minecraft:crossbow",
+    "minecraft:ender_pearl"
   ]
 }

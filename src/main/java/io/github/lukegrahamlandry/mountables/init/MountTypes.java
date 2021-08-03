@@ -84,12 +84,15 @@ public class MountTypes {
         create(EntityType.SQUID, Items.INK_SAC, "textures/entity/squid.png");
         create(EntityType.GUARDIAN, Items.PRISMARINE_SHARD, "textures/entity/guardian.png");
         create(EntityType.SLIME, Items.SLIME_BALL,  "textures/entity/slime/slime.png");
-        create(EntityType.MAGMA_CUBE, Items.BEDROCK,  "textures/entity/slime/magmacube.png");
+        create(EntityType.MAGMA_CUBE, Items.BEDROCK,  "textures/entity/slime/magmacube.png");  // hack to switch model
         create(EntityType.SILVERFISH, Items.STONE,  "textures/entity/silverfish.png");
         create(EntityType.STRIDER, Items.BASALT,  "textures/entity/strider/strider.png");
         create(EntityType.IRON_GOLEM, Items.IRON_BLOCK,  "textures/entity/iron_golem/iron_golem.png");
         create(EntityType.RABBIT, Items.RABBIT,  "textures/entity/rabbit/brown.png");
         create(EntityType.BLAZE, Items.BLAZE_ROD,  "textures/entity/blaze.png");
         create(EntityType.PIGLIN, Items.GOLD_INGOT,  "textures/entity/piglin/piglin.png");
+        create(EntityType.COD, Items.COD,  "textures/entity/fish/cod.png");
+        create(EntityType.PILLAGER, Items.CROSSBOW, "textures/entity/illager/pillager.png");
+        create(EntityType.ENDERMAN, Items.ENDER_PEARL, "textures/entity/enderman/enderman.png");
     }
 }

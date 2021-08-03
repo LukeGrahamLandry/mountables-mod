@@ -10,7 +10,7 @@
       "item": "minecraft:red_dye"
     },
     "c": {
-      "item": "minecraft:mount_core"
+      "item": "mountables:mount_core"
     }
   },
   "result": {

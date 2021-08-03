@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.layers.*;
 import net.minecraft.client.renderer.entity.model.*;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
+import net.minecraft.entity.passive.fish.PufferfishEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
@@ -38,10 +39,24 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (vanillaType == EntityType.WOLF) this.addLayer((LayerRenderer<MountEntity, M>) new CollarLayer((IEntityRenderer<MountEntity, WolfMountModel>) this));
     }
 
+
+    private final CodModel<MountEntity> cod = new CodModel<>();
+    private final SalmonModel<MountEntity> salmon = new SalmonModel<>();
+    private final PufferFishSmallModel<MountEntity> smallPuff = new PufferFishSmallModel<>();
+    private final PufferFishMediumModel<MountEntity> midPuff = new PufferFishMediumModel<>();
+    private final PufferFishBigModel<MountEntity> bigPuff = new PufferFishBigModel<>();
+
     @Override
     public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
         if (mount.getVanillaType() == EntityType.PHANTOM) matrixStack.translate(0, -1, 0);
         if (mount.getVanillaType() == EntityType.SQUID) matrixStack.translate(0, -0.5, 0);
+        if (mount.getVanillaType() == EntityType.COD){
+            if (mount.getTextureType() == 0) this.model = (M) cod;
+            if (mount.getTextureType() == 1) this.model = (M) salmon;
+            if (mount.getTextureType() == 2) this.model = (M) smallPuff;
+            if (mount.getTextureType() == 3) this.model = (M) midPuff;
+            if (mount.getTextureType() == 4) this.model = (M) bigPuff;
+        }
         super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
     }
 
@@ -133,6 +148,14 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         } else if (mount.getVanillaType() == EntityType.PIGLIN) {
             if (mount.getTextureType() == 1) return piglinTextures.get(EntityType.ZOMBIFIED_PIGLIN);
             if (mount.getTextureType() == 2) return piglinTextures.get(EntityType.PIGLIN_BRUTE);
+        } else if (mount.getVanillaType() == EntityType.PILLAGER) {
+            if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/illager/vindicator.png");
+            if (mount.getTextureType() == 2) return new ResourceLocation("textures/entity/illager/illusioner.png");
+            if (mount.getTextureType() == 3) return new ResourceLocation("textures/entity/illager/evoker.png");
+            if (mount.getTextureType() == 4) return new ResourceLocation("textures/entity/witch.png");
+        } else if (mount.getVanillaType() == EntityType.COD) {
+            if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/fish/salmon.png");
+            if (mount.getTextureType() > 1) return new ResourceLocation("textures/entity/fish/pufferfish.png");
         }
 
         return TEXTURE_LOCATION;

@@ -66,7 +66,7 @@ public class MountSummonItem extends Item {
     }
 
     public static ItemStack writeDefaultNBT(ItemStack stack, EntityType type){
-        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0, false, false, 0);
+        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0, fireProofByDefault(type), false, 0);
         return stack;
     }
 
@@ -131,7 +131,11 @@ public class MountSummonItem extends Item {
 
     public static boolean canFlyByDefault(EntityType type) {
         if (!MountsConfig.doSomeStartWithFlight()) return false;
-        return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM;
+        return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM || type == EntityType.BLAZE;
+    }
+
+    public static boolean fireProofByDefault(EntityType type) {
+        return type.fireImmune();
     }
 
     public void fillItemCategory(ItemGroup p_150895_1_, NonNullList<ItemStack> p_150895_2_) {

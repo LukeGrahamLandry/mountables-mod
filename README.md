@@ -40,6 +40,9 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - iron golem (iron block)
     - rabbit (raw rabbit): carrot cycles basic textures, bread for toast, iron sword for killer
     - piglin (gold ingot): rotten flesh to zombify, golden axe for brute, gold ingot to revert
+    - blaze (blaze rod)
+    - pillager (crossbows): emerald for evoker, bow for illusioner, water bottle for witch, iron axe for vindicator, crossbow to revert
+    - cod (raw cod): raw salmon, cod reverts, puffer fish and again to cycle inflation level
     
 ## Support the Developer
 - https://patreon.com/LukeGrahamLandry
