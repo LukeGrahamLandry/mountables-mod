@@ -5,6 +5,7 @@ import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
+import io.github.lukegrahamlandry.mountables.network.NetworkHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
@@ -33,6 +34,7 @@ public class MountablesMain {
         ItemInit.ITEMS.register(modEventBus);
         modEventBus.addListener(MountablesMain::mobAttributes);
         modEventBus.addListener(MountablesMain::generateEggMap);
+        NetworkHandler.registerPackets();
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, MountsConfig.server_config);
         MountsConfig.loadConfig(MountsConfig.server_config, FMLPaths.CONFIGDIR.get().resolve(MOD_ID + ".toml").toString());

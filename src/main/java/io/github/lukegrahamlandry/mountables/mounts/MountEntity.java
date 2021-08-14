@@ -4,6 +4,8 @@ import io.github.lukegrahamlandry.mountables.config.MountsConfig;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.items.MountSummonItem;
+import io.github.lukegrahamlandry.mountables.network.NetworkHandler;
+import io.github.lukegrahamlandry.mountables.network.OpenMountScreenPacket;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.SoundType;
@@ -11,6 +13,7 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
@@ -30,7 +33,9 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.network.PacketDistributor;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
@@ -128,6 +133,14 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         }
 
         ItemStack itemstack = player.getItemInHand(hand);
+
+        if (itemstack.getItem() == ItemInit.COMMAND_CHIP.get()){
+            if (!this.level.isClientSide()){
+                NetworkHandler.INSTANCE.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity)player), new OpenMountScreenPacket(this.getId()));
+            }
+            return ActionResultType.SUCCESS;
+        }
+
         if (!itemstack.isEmpty()) {
             boolean textureSuccess = MountTextureUtil.tryUpdateTexture(this, itemstack);
             if (!textureSuccess) textureSuccess = MountTextureUtil.tryUpdateColor(this, itemstack);
@@ -165,11 +178,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     }
 
 
-                    if (!MountSummonItem.canFlyByDefault(this.getVanillaType())){
-                        this.entityData.set(CAN_FLY, false);
-                    }
+                    this.entityData.set(CAN_FLY, MountSummonItem.canFlyByDefault(this.getVanillaType()));
                     this.entityData.set(HAS_WATER_CORE, false);
-                    this.entityData.set(HAS_FIRE_CORE, false);
+                    this.entityData.set(HAS_FIRE_CORE, MountSummonItem.fireProofByDefault(this.getVanillaType()));
                     this.entityData.set(SPEED_CORES, 0);
                     coreSuccess = true;
                 }
@@ -287,6 +298,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
 
     public void setTextureType(int x){
         this.entityData.set(TEXTURE, x);
+        // todo: % this.getTextureCount
     }
 
     public int getTextureType(){
@@ -313,6 +325,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         nbt.putUUID("owner", getOwnerUUID());
     }
 
+    @Nonnull
     public ItemStack writeToStack(){
         if (this.summonStack == null) this.summonStack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
         MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType(), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(SPEED_CORES));
