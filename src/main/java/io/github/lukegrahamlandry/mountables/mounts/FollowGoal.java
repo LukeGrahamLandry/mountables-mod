@@ -40,7 +40,7 @@ public class FollowGoal extends Goal {
 
     public boolean canUse() {
         LivingEntity livingentity = this.tamable.getOwner();
-        if (livingentity == null || this.tamable.isVehicle()) {
+        if (livingentity == null || this.tamable.isVehicle() || this.tamable.getMovementMode() != 0) {
             return false;
         } else if (this.tamable.distanceToSqr(livingentity) < (double)(this.startDistance * this.startDistance)) {
             return false;
@@ -51,7 +51,7 @@ public class FollowGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
-        if (this.navigation.isDone()) {
+        if (this.navigation.isDone() || this.tamable.getMovementMode() != 0) {
             return false;
         }  else {
             return !(this.tamable.distanceToSqr(this.owner) <= (double)(this.stopDistance * this.stopDistance));

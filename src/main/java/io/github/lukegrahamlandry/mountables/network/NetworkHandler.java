@@ -17,5 +17,6 @@ public class NetworkHandler {
         INSTANCE = NetworkRegistry.newSimpleChannel(new ResourceLocation(MountablesMain.MOD_ID, "packets"), () -> "1.0", s -> true, s -> true);
 
         INSTANCE.registerMessage(nextID(), OpenMountScreenPacket.class, OpenMountScreenPacket::toBytes, OpenMountScreenPacket::new, OpenMountScreenPacket::handle);
+        INSTANCE.registerMessage(nextID(), UpdateMountSettingsPacket.class, UpdateMountSettingsPacket::toBytes, UpdateMountSettingsPacket::new, UpdateMountSettingsPacket::handle);
     }
 }

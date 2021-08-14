@@ -50,7 +50,7 @@ public class MountSummonItem extends Item {
         return EntityType.byString(typeName).orElse(null);
     }
 
-    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby, int color, boolean hasFireCore, boolean hasWaterCore, int speedCores){
+    public static void writeNBT(ItemStack stack, EntityType<?> type, int textureType, int health, boolean flight, boolean baby, int color, boolean hasFireCore, boolean hasWaterCore, int speedCores, int movementMode){
         CompoundNBT tag = stack.hasTag() ? stack.getTag() : new CompoundNBT();
         // MountablesMain.LOGGER.debug("writeNBT " + EntityType.getKey(type).toString());
         tag.putString("typeid", EntityType.getKey(type).toString());
@@ -62,11 +62,12 @@ public class MountSummonItem extends Item {
         tag.putBoolean("hasFireCore", hasFireCore);
         tag.putBoolean("hasWaterCore", hasWaterCore);
         tag.putInt("speedCores", speedCores);
+        tag.putInt("move", movementMode);
         stack.setTag(tag);
     }
 
     public static ItemStack writeDefaultNBT(ItemStack stack, EntityType type){
-        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0, fireProofByDefault(type), false, 0);
+        MountSummonItem.writeNBT(stack, type, 0, MountEntity.maxHealth, canFlyByDefault(type), false, 0, fireProofByDefault(type), false, 0, 0);
         return stack;
     }
 

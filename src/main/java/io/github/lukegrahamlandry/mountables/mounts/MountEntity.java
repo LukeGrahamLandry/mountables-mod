@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
+import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.config.MountsConfig;
 import io.github.lukegrahamlandry.mountables.init.ItemInit;
 import io.github.lukegrahamlandry.mountables.init.MountTypes;
@@ -52,6 +53,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Boolean> HAS_WATER_CORE = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Integer> SPEED_CORES = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
 
+    // [follow, sit, wander]
+    private static final DataParameter<Integer> MOVEMENT_MODE = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
+
     public static final int maxHealth = 20;
 
     private ItemStack summonStack;
@@ -74,6 +78,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.setChild(stack.getTag().getBoolean("baby"));
         int color = stack.getTag().getInt("colortype");
         this.setColorType(color);
+        this.setMovementMode(stack.getTag().getInt("move"));
     }
 
     @Override
@@ -120,6 +125,15 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     public void setCustomName(@Nullable ITextComponent text) {
         super.setCustomName(text);
         if (this.summonStack != null) this.summonStack.setHoverName(text);
+    }
+
+    public void setMovementMode(int x){
+        this.entityData.set(MOVEMENT_MODE, x);
+        MountablesMain.LOGGER.debug("move: " + x);
+    }
+
+    public int getMovementMode(){
+        return this.entityData.get(MOVEMENT_MODE);
     }
 
     @Override
@@ -278,7 +292,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new SwimGoal(this));
-        this.goalSelector.addGoal(1, new FollowGoal(this, 1.25, 10, 2, false));
+        this.goalSelector.addGoal(1, new FollowGoal(this, 1.25, 8, 2, false));
+        this.goalSelector.addGoal(1, new WanderGoal(this, 1));
     }
 
     @Override
@@ -294,11 +309,15 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.entityData.define(HAS_WATER_CORE, false);
         this.entityData.define(HAS_FIRE_CORE, false);
         this.entityData.define(SPEED_CORES, 0);
+        this.entityData.define(MOVEMENT_MODE, 0);
     }
 
     public void setTextureType(int x){
         this.entityData.set(TEXTURE, x);
-        // todo: % this.getTextureCount
+    }
+
+    public void trySetTextureType(int x){
+        this.entityData.set(TEXTURE, Math.max(x, 0) % MountTypes.get(this.getVanillaType()).textureCount);
     }
 
     public int getTextureType(){
@@ -328,7 +347,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Nonnull
     public ItemStack writeToStack(){
         if (this.summonStack == null) this.summonStack = new ItemStack(ItemInit.MOUNT_SUMMON.get());
-        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType(), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(SPEED_CORES));
+        MountSummonItem.writeNBT(this.summonStack, this.vanillaType, this.getTextureType(), (int) this.getHealth(), this.canFly(), this.isBaby(), this.getColorType(), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(HAS_FIRE_CORE), this.entityData.get(SPEED_CORES), this.getMovementMode());
         return this.summonStack;
     }
 
@@ -341,7 +360,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.setOwnerUUID(nbt.getUUID("owner"));
     }
 
-    private boolean canFly() {
+    public boolean canFly() {
         return this.entityData.get(CAN_FLY);
     }
 
