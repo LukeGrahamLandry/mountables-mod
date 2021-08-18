@@ -63,10 +63,13 @@ public class RenderHandler {
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
+        MountTypes.createExtraMounts(); // client only
+        mountModels.put(MountTypes.MUSHROOM.get(), RedMushroomModel::new);
+
         for (EntityType vanillaType : mountModels.keySet()){
             MountTypes.MountTypeData thing = MountTypes.get(vanillaType);
             RenderingRegistry.registerEntityRenderingHandler(thing.getType(), (manager) -> {
-                return new GenericMountRenderer<>(manager, vanillaType, thing.textureLocation, mountModels.get(vanillaType));
+                return new GenericMountRenderer<>(manager, vanillaType, thing.textureLocation, mountModels.getOrDefault(vanillaType, null));
             });
         }
     }

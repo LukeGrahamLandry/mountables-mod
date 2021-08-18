@@ -42,7 +42,6 @@ public class UpdateMountSettingsPacket {
             Entity thing = player.level.getEntity(msg.entityId);
             if (thing instanceof MountEntity){
                 MountEntity mount = (MountEntity) thing;
-                MountablesMain.LOGGER.debug(msg.textureType + " " + msg.movementType);
                 mount.setTextureType(msg.textureType);
                 mount.setMovementMode(msg.movementType);
             }

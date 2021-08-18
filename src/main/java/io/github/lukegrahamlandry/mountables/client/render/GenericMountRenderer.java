@@ -5,6 +5,7 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import io.github.lukegrahamlandry.mountables.MountablesMain;
 import io.github.lukegrahamlandry.mountables.client.models.*;
 import io.github.lukegrahamlandry.mountables.client.render.layer.*;
+import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
@@ -45,6 +46,9 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     private final PufferFishSmallModel<MountEntity> smallPuff = new PufferFishSmallModel<>();
     private final PufferFishMediumModel<MountEntity> midPuff = new PufferFishMediumModel<>();
     private final PufferFishBigModel<MountEntity> bigPuff = new PufferFishBigModel<>();
+    private final BrownMushroomModel<MountEntity> brownMushroom = new BrownMushroomModel<>();
+    private final RedMushroomModel<MountEntity> redMushroom = new RedMushroomModel<>();
+    private final WarpedMushroomModel<MountEntity> warpedMushroom = new WarpedMushroomModel<>();
 
     @Override
     public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
@@ -57,6 +61,12 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             if (mount.getTextureType() == 3) this.model = (M) midPuff;
             if (mount.getTextureType() == 4) this.model = (M) bigPuff;
         }
+        if (mount.getVanillaType() == MountTypes.MUSHROOM.get()){
+            if (mount.getTextureType() == 0) this.model = (M) redMushroom;
+            if (mount.getTextureType() == 1) this.model = (M) brownMushroom;
+            if (mount.getTextureType() == 2) this.model = (M) warpedMushroom;
+            // if (mount.getTextureType() == 3) this.model = (M) midPuff;
+        }
         super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
     }
 
@@ -64,7 +74,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     protected void scale(MountEntity mount, MatrixStack p_225620_2_, float p_225620_3_) {
         if (mount.getVanillaType() == EntityType.GHAST && !mount.isBaby()) p_225620_2_.scale(4.5F, 4.5F, 4.5F);
         if (mount.getVanillaType() == EntityType.WITHER && !mount.isBaby()) p_225620_2_.scale(2,2,2);
-        if (mount.getVanillaType() == EntityType.SLIME){
+        if (mount.getVanillaType() == EntityType.SLIME || mount.getVanillaType() == MountTypes.MUSHROOM.get()){
             float size = mount.isBaby() ? 1 : 4;
             p_225620_2_.scale(0.999F, 0.999F, 0.999F);
             p_225620_2_.translate(0.0D, (double)0.001F, 0.0D);
@@ -156,6 +166,10 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         } else if (mount.getVanillaType() == EntityType.COD) {
             if (mount.getTextureType() == 1) return new ResourceLocation("textures/entity/fish/salmon.png");
             if (mount.getTextureType() > 1) return new ResourceLocation("textures/entity/fish/pufferfish.png");
+        } else if (mount.getVanillaType() == MountTypes.MUSHROOM.get()) {
+            if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/brownmushroom.png");
+            if (mount.getTextureType() == 2) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/warpedmushroom.png");
+            if (mount.getTextureType() == 3) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/crimsonmushroom.png");
         }
 
         return TEXTURE_LOCATION;

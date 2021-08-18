@@ -1,5 +1,6 @@
 package io.github.lukegrahamlandry.mountables.mounts;
 
+import io.github.lukegrahamlandry.mountables.init.MountTypes;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.item.*;
@@ -101,6 +102,13 @@ public class MountTextureUtil {
             if (itemstack.getItem() == Items.COD) newTexture = 0;
             else if (itemstack.getItem() == Items.SALMON) newTexture = 1;
             else if (itemstack.getItem() == Items.PUFFERFISH) newTexture = 2 + ((oldTexture + 1) % 3);
+        }
+
+        if (vanillaType == MountTypes.MUSHROOM.get()) {
+            if (itemstack.getItem() == Items.RED_MUSHROOM) newTexture = 0;
+            else if (itemstack.getItem() == Items.BROWN_MUSHROOM) newTexture = 1;
+            else if (itemstack.getItem() == Items.WARPED_FUNGUS) newTexture = 2;
+            else if (itemstack.getItem() == Items.CRIMSON_FUNGUS) newTexture = 3;
         }
 
         if (newTexture != -1) mount.setTextureType(newTexture);

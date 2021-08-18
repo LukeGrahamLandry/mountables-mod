@@ -20,6 +20,21 @@ import java.util.Set;
 public class MountTypes {
     public static DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITIES, MountablesMain.MOD_ID);
 
+
+    // new custom mount types that dont exist as normal mobs
+    // the only reason i have to do this is because im using entity types as the key for the mounts
+    // instead of using the strings directly as i should and im too lazy to change it
+    // maybe make an addon mod that adds these as real mobs (just enable them when its installed)
+
+    public static final RegistryObject<EntityType<GoPoof>> MUSHROOM = ENTITY_TYPES.register("mushroom",
+            () -> EntityType.Builder.of(GoPoof::new, EntityClassification.MISC).sized(2.5F, 1.7F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "mushroom").toString()));
+
+    public static final RegistryObject<EntityType<MountEntity>> MUSHROOM_MOUNT = ENTITY_TYPES.register("mushroom_mount",
+            () -> EntityType.Builder.of(MountEntity::new, EntityClassification.MISC).sized(2.5F, 1.7F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "mushroom_mount").toString()));
+
+
     private static final Map<EntityType<? extends LivingEntity>, MountTypeData> mountLookup = new HashMap<>();
     private static final Map<Item, EntityType<? extends LivingEntity>> mountRecipeLookup = new HashMap<>();
 
@@ -97,5 +112,9 @@ public class MountTypes {
         create(EntityType.COD, Items.COD,  "textures/entity/fish/cod.png", 5);
         create(EntityType.PILLAGER, Items.CROSSBOW, "textures/entity/illager/pillager.png", 5);
         create(EntityType.ENDERMAN, Items.ENDER_PEARL, "textures/entity/enderman/enderman.png", 1);
+    }
+    public static void createExtraMounts() {
+        mountLookup.put(MUSHROOM.get(), new MountTypeData(MUSHROOM_MOUNT, Items.RED_MUSHROOM, MountablesMain.MOD_ID + ":textures/entity/redmushroom.png", 4));
+        mountRecipeLookup.put(Items.RED_MUSHROOM, MUSHROOM.get());
     }
 }

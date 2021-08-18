@@ -41,6 +41,7 @@ public class MountablesMain {
     }
 
     public static void mobAttributes(EntityAttributeCreationEvent event){
+        MountTypes.createExtraMounts();  // server only
         for (EntityType type : MountTypes.getMountTypes()){
             event.put(MountTypes.get(type).getType(), MobEntity.createMobAttributes().add(Attributes.MAX_HEALTH, MountEntity.maxHealth).add(Attributes.MOVEMENT_SPEED, (double)0.23F).build());
         }
