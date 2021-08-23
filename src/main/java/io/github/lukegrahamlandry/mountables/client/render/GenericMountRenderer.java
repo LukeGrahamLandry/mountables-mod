@@ -171,7 +171,10 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/brownmushroom.png");
             if (mount.getTextureType() == 2) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/warpedmushroom.png");
             if (mount.getTextureType() == 3) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/crimsonmushroom.png");
+        } else if (mount.getVanillaType() == MountTypes.BLUE_ELEPHANT.get()) {
+            if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/blue_elephant_retro.png");
         }
+
 
         return TEXTURE_LOCATION;
     }

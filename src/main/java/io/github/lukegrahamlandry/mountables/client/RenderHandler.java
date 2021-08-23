@@ -66,6 +66,7 @@ public class RenderHandler {
         MountTypes.createExtraMounts(); // client only
         mountModels.put(MountTypes.MUSHROOM.get(), RedMushroomModel::new);
         mountModels.put(MountTypes.WISP.get(), WispModel::new);
+        mountModels.put(MountTypes.BLUE_ELEPHANT.get(), BlueElephantModel::new);
 
         for (EntityType vanillaType : mountModels.keySet()){
             MountTypes.MountTypeData thing = MountTypes.get(vanillaType);

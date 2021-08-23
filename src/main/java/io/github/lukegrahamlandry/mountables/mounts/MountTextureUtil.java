@@ -110,6 +110,10 @@ public class MountTextureUtil {
             else if (itemstack.getItem() == Items.WARPED_FUNGUS) newTexture = 2;
             else if (itemstack.getItem() == Items.CRIMSON_FUNGUS) newTexture = 3;
         }
+        if (vanillaType == MountTypes.BLUE_ELEPHANT.get()){
+            if (itemstack.getItem() == Items.LIGHT_BLUE_DYE) newTexture = 0;
+            if (itemstack.getItem() == Items.BLUE_DYE) newTexture = 1;
+        }
 
         if (newTexture != -1) mount.setTextureType(newTexture);
         return newTexture != -1 && newTexture != oldTexture;

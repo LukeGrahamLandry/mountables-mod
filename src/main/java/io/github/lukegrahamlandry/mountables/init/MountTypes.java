@@ -42,6 +42,22 @@ public class MountTypes {
             () -> EntityType.Builder.of(MountEntity::new, EntityClassification.MISC).sized(0.65F, 0.65F)
                     .build(new ResourceLocation(MountablesMain.MOD_ID, "wisp_mount").toString()));
 
+    public static final RegistryObject<EntityType<GoPoof>> BLUE_ELEPHANT = ENTITY_TYPES.register("blue_elephant",
+            () -> EntityType.Builder.of(GoPoof::new, EntityClassification.MISC).sized(0.65F, 0.65F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "blue_elephant").toString()));
+
+    public static final RegistryObject<EntityType<MountEntity>> BLUE_ELEPHANT_MOUNT = ENTITY_TYPES.register("blue_elephant_mount",
+            () -> EntityType.Builder.of(MountEntity::new, EntityClassification.MISC).sized(0.65F, 0.65F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "blue_elephant_mount").toString()));
+
+    public static final RegistryObject<EntityType<GoPoof>> TOTEM = ENTITY_TYPES.register("totem",
+            () -> EntityType.Builder.of(GoPoof::new, EntityClassification.MISC).sized(0.65F, 0.65F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "totem").toString()));
+
+    public static final RegistryObject<EntityType<MountEntity>> TOTEM_MOUNT = ENTITY_TYPES.register("totem_mount",
+            () -> EntityType.Builder.of(MountEntity::new, EntityClassification.MISC).sized(0.65F, 0.65F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "totem_mount").toString()));
+
 
     private static final Map<EntityType<? extends LivingEntity>, MountTypeData> mountLookup = new HashMap<>();
     private static final Map<Item, EntityType<? extends LivingEntity>> mountRecipeLookup = new HashMap<>();
@@ -121,10 +137,15 @@ public class MountTypes {
         create(EntityType.PILLAGER, Items.CROSSBOW, "textures/entity/illager/pillager.png", 5);
         create(EntityType.ENDERMAN, Items.ENDER_PEARL, "textures/entity/enderman/enderman.png", 1);
     }
+
     public static void createExtraMounts() {
         mountLookup.put(MUSHROOM.get(), new MountTypeData(MUSHROOM_MOUNT, Items.RED_MUSHROOM, MountablesMain.MOD_ID + ":textures/entity/redmushroom.png", 4));
         mountRecipeLookup.put(Items.RED_MUSHROOM, MUSHROOM.get());
         mountLookup.put(WISP.get(), new MountTypeData(WISP_MOUNT, Items.SOUL_LANTERN, MountablesMain.MOD_ID + ":textures/entity/wisp.png", 1));
         mountRecipeLookup.put(Items.SOUL_LANTERN, WISP.get());
+        mountLookup.put(BLUE_ELEPHANT.get(), new MountTypeData(BLUE_ELEPHANT_MOUNT, Items.IRON_SWORD, MountablesMain.MOD_ID + ":textures/entity/blue_elephant.png", 2));
+        mountRecipeLookup.put(Items.IRON_SWORD, BLUE_ELEPHANT.get());
+        mountLookup.put(TOTEM.get(), new MountTypeData(TOTEM_MOUNT, Items.TOTEM_OF_UNDYING, MountablesMain.MOD_ID + ":textures/entity/totem.png", 1));
+        mountRecipeLookup.put(Items.TOTEM_OF_UNDYING, TOTEM.get());
     }
 }
