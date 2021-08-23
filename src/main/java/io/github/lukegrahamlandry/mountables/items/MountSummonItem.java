@@ -132,7 +132,7 @@ public class MountSummonItem extends Item {
 
     public static boolean canFlyByDefault(EntityType type) {
         if (!MountsConfig.doSomeStartWithFlight()) return false;
-        return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM || type == EntityType.BLAZE;
+        return type == EntityType.GHAST || type == EntityType.WITHER || type == EntityType.BEE || type == EntityType.PHANTOM || type == EntityType.BLAZE || type == MountTypes.WISP.get();
     }
 
     public static boolean fireProofByDefault(EntityType type) {

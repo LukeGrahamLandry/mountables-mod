@@ -49,6 +49,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     private final BrownMushroomModel<MountEntity> brownMushroom = new BrownMushroomModel<>();
     private final RedMushroomModel<MountEntity> redMushroom = new RedMushroomModel<>();
     private final WarpedMushroomModel<MountEntity> warpedMushroom = new WarpedMushroomModel<>();
+    private final CrimsonMushroomModel<MountEntity> crimsonMushroom = new CrimsonMushroomModel<>();
 
     @Override
     public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
@@ -65,7 +66,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             if (mount.getTextureType() == 0) this.model = (M) redMushroom;
             if (mount.getTextureType() == 1) this.model = (M) brownMushroom;
             if (mount.getTextureType() == 2) this.model = (M) warpedMushroom;
-            // if (mount.getTextureType() == 3) this.model = (M) midPuff;
+            if (mount.getTextureType() == 3) this.model = (M) crimsonMushroom;
         }
         super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
     }

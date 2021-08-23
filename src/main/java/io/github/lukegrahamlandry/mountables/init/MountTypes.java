@@ -34,6 +34,14 @@ public class MountTypes {
             () -> EntityType.Builder.of(MountEntity::new, EntityClassification.MISC).sized(2.5F, 1.7F)
                     .build(new ResourceLocation(MountablesMain.MOD_ID, "mushroom_mount").toString()));
 
+    public static final RegistryObject<EntityType<GoPoof>> WISP = ENTITY_TYPES.register("wisp",
+            () -> EntityType.Builder.of(GoPoof::new, EntityClassification.MISC).sized(0.65F, 0.65F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "wisp").toString()));
+
+    public static final RegistryObject<EntityType<MountEntity>> WISP_MOUNT = ENTITY_TYPES.register("wisp_mount",
+            () -> EntityType.Builder.of(MountEntity::new, EntityClassification.MISC).sized(0.65F, 0.65F)
+                    .build(new ResourceLocation(MountablesMain.MOD_ID, "wisp_mount").toString()));
+
 
     private static final Map<EntityType<? extends LivingEntity>, MountTypeData> mountLookup = new HashMap<>();
     private static final Map<Item, EntityType<? extends LivingEntity>> mountRecipeLookup = new HashMap<>();
@@ -116,5 +124,7 @@ public class MountTypes {
     public static void createExtraMounts() {
         mountLookup.put(MUSHROOM.get(), new MountTypeData(MUSHROOM_MOUNT, Items.RED_MUSHROOM, MountablesMain.MOD_ID + ":textures/entity/redmushroom.png", 4));
         mountRecipeLookup.put(Items.RED_MUSHROOM, MUSHROOM.get());
+        mountLookup.put(WISP.get(), new MountTypeData(WISP_MOUNT, Items.SOUL_LANTERN, MountablesMain.MOD_ID + ":textures/entity/wisp.png", 1));
+        mountRecipeLookup.put(Items.SOUL_LANTERN, WISP.get());
     }
 }

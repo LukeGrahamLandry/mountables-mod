@@ -96,6 +96,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     @Override
     public EntitySize getDimensions(Pose p_213305_1_) {
         if (this.getVanillaType() == MountTypes.MUSHROOM.get() && this.getTextureType() == 2) return new EntitySize(this.getVanillaType().getDimensions().width, 2.2F, false).scale(this.getScale());
+        if (this.getVanillaType() == MountTypes.MUSHROOM.get() && this.getTextureType() == 3) return new EntitySize(this.getVanillaType().getDimensions().width, 3F, false).scale(this.getScale());
         return this.getVanillaType().getDimensions().scale(this.getScale());
     }
 

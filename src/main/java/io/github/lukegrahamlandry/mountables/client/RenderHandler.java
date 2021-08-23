@@ -65,6 +65,7 @@ public class RenderHandler {
     public static void onClientSetup(FMLClientSetupEvent event) {
         MountTypes.createExtraMounts(); // client only
         mountModels.put(MountTypes.MUSHROOM.get(), RedMushroomModel::new);
+        mountModels.put(MountTypes.WISP.get(), WispModel::new);
 
         for (EntityType vanillaType : mountModels.keySet()){
             MountTypes.MountTypeData thing = MountTypes.get(vanillaType);
