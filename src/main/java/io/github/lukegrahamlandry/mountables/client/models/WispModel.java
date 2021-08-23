@@ -16,10 +16,6 @@ public class WispModel<T extends Entity> extends EntityModel<T> {
 	private final ModelRenderer arm1;
 	private final ModelRenderer arm2;
 	private final ModelRenderer tail;
-	private final float d;
-	private final float c;
-	private final float b;
-	private final float a;
 
 	public WispModel() {
 		texWidth = 48;
@@ -46,11 +42,6 @@ public class WispModel<T extends Entity> extends EntityModel<T> {
 		root.addChild(tail);
 		setRotationAngle(tail, 0.3927F, 0.0F, 0.0F);
 		tail.texOffs(0, 1).addBox(-0.5F, -0.5F, 0.0F, 1.0F, 4.0F, 0.0F, 0.0F, false);
-
-		this.a = this.root.xRot;
-		this.b = this.arm1.yRot;
-		this.c = this.arm2.yRot;
-		this.d = this.tail.xRot;
 	}
 
 	@Override
@@ -68,11 +59,11 @@ public class WispModel<T extends Entity> extends EntityModel<T> {
 	@Override
 	public void setupAnim(T mount, float animPosition, float animSpeed, float bob, float rotationSomethingIDK, float xRot) {
 		// time should be in seconds. should not be larger than the length of the animation (because you don't want the trig functions to make a circle)
-		double time = (mount.tickCount % 40) / 20D;
-		this.root.xRot = (float) Math.toRadians( (float) Math.sin(Math.toDegrees(time * 180)) * 2 ) + a;
-		this.arm1.yRot = (float) Math.toRadians( (float) Math.sin(Math.toDegrees(time * 180)) * -4 ) + b;
-		this.arm2.yRot = (float) Math.toRadians( (float) Math.sin(Math.toDegrees(time * 180)) * 4 ) + c;
-		this.tail.xRot = (float) Math.toRadians( (float) Math.sin(Math.toDegrees(-36+time * 180)) * 8 ) + d;
+		double time = (mount.tickCount % 40) / 25D;
+		this.root.xRot = (float) Math.toRadians( (float) Math.sin(Math.toRadians(time * 180)) * 2 );
+		this.arm1.yRot = (float) Math.toRadians( (float) Math.sin(Math.toRadians(time * 180)) * -4 );
+		this.arm2.yRot = (float) Math.toRadians( (float) Math.sin(Math.toRadians(time * 180)) * 4 );
+		this.tail.xRot = (float) Math.toRadians( (float) Math.sin(Math.toRadians(-36+time * 180)) * 8 );
 	}
 
 	@Override

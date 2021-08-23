@@ -5,11 +5,12 @@ package io.github.lukegrahamlandry.mountables.client.models;// Made with Blockbe
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import io.github.lukegrahamlandry.mountables.mounts.MountEntity;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
-public class TotemModel<T extends Entity> extends EntityModel<T> {
+public class TotemModel<T extends MountEntity> extends EntityModel<T> {
 	private final ModelRenderer body;
 	private final ModelRenderer head;
 	private final ModelRenderer arms;
@@ -65,20 +66,25 @@ public class TotemModel<T extends Entity> extends EntityModel<T> {
 
 	@Override
 	public void setupAnim(T mount, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_) {
-		double anim_time = (mount.tickCount % (0.75 * 20)) / 20D;
+		double anim_time = (mount.tickCount % (15)) / 25D;
 
-		boolean flying = true;
-		boolean walking = false;
-		if (flying){
+		if (mount.isFlying()){
 			updateRotation(leg0, (float) Math.toRadians(45), 0, 0);
 			updateRotation(leg1, (float) Math.toRadians(45), 0, 0);
-		} else if (walking){
-			updateRotation(leg0, degSin(anim_time*480)*-15, 0, 0);
-			updateRotation(leg1, degSin(anim_time*480)*15, 0, 0);
+
 			updateRotation(wing1, 0, degSin(anim_time*960)*15, 0);
 			updateRotation(wing2, 0, degSin(anim_time*960)*15, 0);
-		} else {
+		} else if (mount.hasMoved()){
+			updateRotation(leg0, degSin(anim_time*480)*-15, 0, 0);
+			updateRotation(leg1, degSin(anim_time*480)*15, 0, 0);
 
+			setRotationAngle(wing1, 0.0F, -0.3927F, 0.0F);
+			setRotationAngle(wing2, 0.0F, 0.3927F, 0.0F);
+		} else {
+			setRotationAngle(leg0, 0, 0, 0);
+			setRotationAngle(leg1, 0, 0, 0);
+			setRotationAngle(wing1, 0.0F, -0.3927F, 0.0F);
+			setRotationAngle(wing2, 0.0F, 0.3927F, 0.0F);
 		}
 	}
 
@@ -88,8 +94,7 @@ public class TotemModel<T extends Entity> extends EntityModel<T> {
 
 
 	private void updateRotation(ModelRenderer part, float x, float y, float z){
-		// save base value first then add it?
-		setRotationAngle(part, x, y, z);
+		setRotationAngle(part, (float) Math.toRadians(x), (float) Math.toRadians(y), (float) Math.toRadians(z));
 	}
 
 	@Override

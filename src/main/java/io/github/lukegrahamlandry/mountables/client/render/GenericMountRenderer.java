@@ -41,7 +41,7 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (vanillaType == EntityType.LLAMA) this.addLayer((LayerRenderer<MountEntity, M>) new LlamaCarpetLayer((IEntityRenderer<MountEntity, LlamaMountModel>) this));
         if (vanillaType == EntityType.CREEPER) this.addLayer((LayerRenderer<MountEntity, M>) new ChargedCreeperLayer((IEntityRenderer<MountEntity, CreeperModel<MountEntity>>) this));;
         if (vanillaType == EntityType.WOLF) this.addLayer((LayerRenderer<MountEntity, M>) new CollarLayer((IEntityRenderer<MountEntity, WolfMountModel>) this));
-        if (vanillaType == EntityType.SPIDER) this.addLayer((LayerRenderer<MountEntity, M>) new SpiderEyesLayer<>((IEntityRenderer<MountEntity, SpiderModel>) this));
+        if (vanillaType == EntityType.SPIDER) this.addLayer((LayerRenderer<MountEntity, M>) new SpiderMountEyes((IEntityRenderer<MountEntity, EntityModel<MountEntity>>) this));
     }
 
     private PhantomMountEyesLayer eyesRender;

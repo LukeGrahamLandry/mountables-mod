@@ -72,6 +72,7 @@ public class RenderHandler {
         mountModels.put(MountTypes.MUSHROOM.get(), RedMushroomModel::new);
         mountModels.put(MountTypes.WISP.get(), WispModel::new);
         mountModels.put(MountTypes.BLUE_ELEPHANT.get(), BlueElephantModel::new);
+        mountModels.put(MountTypes.TOTEM.get(), TotemModel::new);
 
         for (EntityType vanillaType : mountModels.keySet()){
             MountTypes.MountTypeData thing = MountTypes.get(vanillaType);

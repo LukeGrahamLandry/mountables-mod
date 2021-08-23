@@ -53,6 +53,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
     private static final DataParameter<Boolean> HAS_WATER_CORE = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Integer> SPEED_CORES = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
 
+    private static final DataParameter<Boolean> IS_FLYING = EntityDataManager.defineId(MountEntity.class, DataSerializers.BOOLEAN);
+
     // [follow, sit, wander]
     private static final DataParameter<Integer> MOVEMENT_MODE = EntityDataManager.defineId(MountEntity.class, DataSerializers.INT);
 
@@ -318,6 +320,8 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         this.entityData.define(HAS_FIRE_CORE, false);
         this.entityData.define(SPEED_CORES, 0);
         this.entityData.define(MOVEMENT_MODE, 0);
+
+        this.entityData.define(IS_FLYING, false);
     }
 
     public void setTextureType(int x){
@@ -722,6 +726,18 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
         return !this.canBeRiddenInWater(null);
     }
 
+    public boolean isFlying(){
+        return this.entityData.get(IS_FLYING) && !this.isOnGround();
+    }
+
+    private void setIsFlying(boolean flag){
+        this.entityData.set(IS_FLYING, flag);
+    }
+
+    public boolean hasMoved(){
+        return (this.getX() - this.xo) != 0 || (this.getZ() - this.zo) != 0;
+    }
+
     boolean isFlying = false;
     int slimeHopTimer = 10;
     public void travel(Vector3d travelVec) {
@@ -730,10 +746,10 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 LivingEntity rider = (LivingEntity) this.getPassengers().get(0);
 
                 if (this.canBeRiddenInWater(rider) && this.isInWaterOrBubble()){
-                    isFlying = true;
+                    setIsFlying(true);
                 }
                 if (this.canBeRiddenInWater(rider) && !this.isInWaterOrBubble() && this.isFlying && !this.canFly()){
-                    isFlying = false;
+                    setIsFlying(false);
                 }
                 this.setOnGround(!isFlying);
 
@@ -755,9 +771,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                         this.setRot(this.yRot, this.xRot);
                         if (rider.xRot < -10 || rider.xRot > 10) {
                             yComponent = -(Math.toRadians(rider.xRot) * this.getFlyingSpeed());
-                            if (!isFlying && yComponent > 0) isFlying = true;  // that makes no sense?
+                            if (!isFlying && yComponent > 0) setIsFlying(true);  // that makes no sense?
                             else if (isFlying && yComponent < 0 && downSolid)
-                                isFlying = false;
+                                setIsFlying(false);
                         }
                     } else if (rider.zza < 0) {
                         moveForward = -this.getFlyingSpeed();
@@ -765,9 +781,9 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                         this.setRot(this.yRot, this.xRot);
                         if (rider.xRot < -10 || rider.xRot > 10) {
                             yComponent = (Math.toRadians(rider.xRot) * this.getFlyingSpeed());
-                            if (!isFlying && yComponent > 0) isFlying = true;
+                            if (!isFlying && yComponent > 0) setIsFlying(true);
                             else if (isFlying && yComponent < 0 && downSolid)
-                                isFlying = false;
+                                setIsFlying(false);
                         }
                     }
 
@@ -832,7 +848,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                     }
 
                     this.playerJumpPendingScale = 0.0F;
-                    if (canFly()) isFlying = true;
+                    if (canFly()) setIsFlying(true);
                 } else if (this.onGround && this.isBouncy() && (f != 0 || f1 != 0)){
                     if (slimeHopTimer >= 3){
                         doSlimeJump((float) f1, 1, 1);
@@ -858,7 +874,7 @@ public class MountEntity extends CreatureEntity implements IJumpingMount{
                 this.calculateEntityAnimation(this, false);
 
                 // flight logic
-                if (livingentity.xRot < -25 && livingentity.zza > 0) isFlying = true;
+                if (livingentity.xRot < -25 && livingentity.zza > 0) setIsFlying(true);
             } else {
                 float speed = this.isSlowOnLand() ? 0.05F : this.getWalkingSpeed();
                 this.setSpeed(speed);
