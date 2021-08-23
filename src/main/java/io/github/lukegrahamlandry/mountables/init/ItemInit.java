@@ -15,6 +15,7 @@ public class ItemInit {
     public static final RegistryObject<Item> MOUNT_SUMMON = ITEMS.register("mount_summon", () -> new MountSummonItem(new Item.Properties().stacksTo(1).tab(ModTab.instance)));
     public static final RegistryObject<Item> MOUNT_CORE = ITEMS.register("mount_core", () -> new Item(new Item.Properties().tab(ModTab.instance)));
     public static final RegistryObject<Item> COMMAND_CHIP = ITEMS.register("command_chip", () -> new Item(new Item.Properties().tab(ModTab.instance)));
+    public static final RegistryObject<Item> MYSTERIOUS_FRAGMENT = ITEMS.register("mysterious_fragment", () -> new Item(new Item.Properties().tab(ModTab.instance)));
 
     public static final RegistryObject<Item> FLIGHT_CORE = ITEMS.register("flight_core", () -> new Item(new Item.Properties().tab(ModTab.instance)));
     public static final RegistryObject<Item> FIRE_CORE = ITEMS.register("fire_core", () -> new Item(new Item.Properties().tab(ModTab.instance)));

@@ -1,8 +1,11 @@
 {
   "parent": "item/generated",
-  "textures": {
-    "layer0": "mountables:items/mountable_core",
-    "layer1": "mountables:items/core_overlay_1",
-    "layer2": "mountables:items/core_overlay_2"
-  }
+
+  "overrides": [
+    { "predicate": { "mountables:summon_type": 0 }, "model": "mountables:item/summon/spawn_egg_colors" },
+    { "predicate": { "mountables:summon_type": 1 }, "model": "mountables:item/summon/mushroom" },
+    { "predicate": { "mountables:summon_type": 2 }, "model": "mountables:item/summon/wisp" },
+    { "predicate": { "mountables:summon_type": 3 }, "model": "mountables:item/summon/blue_elephant" },
+    { "predicate": { "mountables:summon_type": 4 }, "model": "mountables:item/summon/totem" }
+  ]
 }

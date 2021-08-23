@@ -1,6 +1,8 @@
 {
   "item.mountables.mount_core": "Mountable Core",
   "item.mountables.mount_summon": "Mountable",
+  "item.mountables.command_chip": "Command Chip",
+  "item.mountables.mysterious_fragment": "Mysterious Fragment",
 
   "item.mountables.flight_core": "Flight Core",
   "item.mountables.speed_core": "Speed Core",

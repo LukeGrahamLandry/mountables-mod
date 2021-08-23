@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "isi",
+    "dcd",
+    "ddd"
+  ],
+  "key": {
+    "c": {
+      "item": "mountables:mount_core"
+    },
+    "d": {
+      "item": "minecraft:light_blue_dye"
+    },
+    "i": {
+      "item": "minecraft:iron_sword"
+    },
+    "s": {
+      "item": "minecraft:shield"
+    }
+  },
+  "result": {
+    "item": "mountables:mount_summon"
+  }
+}

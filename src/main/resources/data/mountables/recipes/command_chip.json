@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " t ",
+    "fff",
+    " f "
+  ],
+  "key": {
+    "t": {
+      "item": "minecraft:redstone_torch"
+    },
+    "f": {
+      "item": "mountables:mysterious_fragment"
+    }
+  },
+  "result": {
+    "item": "mountables:command_chip"
+  }
+}
