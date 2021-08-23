@@ -117,7 +117,7 @@ public class MountTypes {
         create(EntityType.ZOMBIE, Items.ROTTEN_FLESH, "textures/entity/zombie/zombie.png", 3);
         create(EntityType.SKELETON, Items.ARROW, "textures/entity/skeleton/skeleton.png", 3);
         create(EntityType.PHANTOM, Items.PHANTOM_MEMBRANE, "textures/entity/phantom.png", 1);
-        create(EntityType.BEE, Items.HONEYCOMB, "textures/entity/bee/bee.png", 1);
+        create(EntityType.BEE, Items.HONEYCOMB, "textures/entity/bee/bee.png", 2);
         create(EntityType.GHAST, Items.GHAST_TEAR, "textures/entity/ghast/ghast.png", 1);
         create(EntityType.WITHER, Items.SOUL_SAND, "textures/entity/wither/wither.png", 1);
         create(EntityType.HOGLIN, Items.COOKED_PORKCHOP, "textures/entity/hoglin/hoglin.png", 2);

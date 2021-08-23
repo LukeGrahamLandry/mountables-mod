@@ -33,13 +33,18 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
         if (vanillaType == EntityType.SNOW_GOLEM) this.addLayer((LayerRenderer<MountEntity, M>) new PumpkinHeadLayer((IEntityRenderer<MountEntity, SnowManModel<MountEntity>>) this));
         if (vanillaType == EntityType.ZOMBIE) this.addLayer((LayerRenderer<MountEntity, M>) new DrownedLayer((IEntityRenderer<MountEntity, ZombieMountModel>) this));
         if (vanillaType == EntityType.SKELETON) this.addLayer((LayerRenderer<MountEntity, M>) new StrayLayer((IEntityRenderer<MountEntity, SkeletonMountModel>) this));
-        if (vanillaType == EntityType.PHANTOM) this.addLayer((LayerRenderer<MountEntity, M>) new PhantomEyesLayer<>((IEntityRenderer<MountEntity, PhantomModel<MountEntity>>) this));
+        if (vanillaType == EntityType.PHANTOM) {
+            this.eyesRender =  new PhantomMountEyesLayer<>((IEntityRenderer<MountEntity, PhantomModel<MountEntity>>) this);
+            this.addLayer((LayerRenderer<MountEntity, M>) this.eyesRender);
+        }
         if (vanillaType == EntityType.SLIME) this.addLayer((LayerRenderer<MountEntity, M>) new SlimeGelLayer(this));
         if (vanillaType == EntityType.LLAMA) this.addLayer((LayerRenderer<MountEntity, M>) new LlamaCarpetLayer((IEntityRenderer<MountEntity, LlamaMountModel>) this));
         if (vanillaType == EntityType.CREEPER) this.addLayer((LayerRenderer<MountEntity, M>) new ChargedCreeperLayer((IEntityRenderer<MountEntity, CreeperModel<MountEntity>>) this));;
         if (vanillaType == EntityType.WOLF) this.addLayer((LayerRenderer<MountEntity, M>) new CollarLayer((IEntityRenderer<MountEntity, WolfMountModel>) this));
+        if (vanillaType == EntityType.SPIDER) this.addLayer((LayerRenderer<MountEntity, M>) new SpiderEyesLayer<>((IEntityRenderer<MountEntity, SpiderModel>) this));
     }
 
+    private PhantomMountEyesLayer eyesRender;
 
     private final CodModel<MountEntity> cod = new CodModel<>();
     private final SalmonModel<MountEntity> salmon = new SalmonModel<>();
@@ -50,6 +55,9 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
     private final RedMushroomModel<MountEntity> redMushroom = new RedMushroomModel<>();
     private final WarpedMushroomModel<MountEntity> warpedMushroom = new WarpedMushroomModel<>();
     private final CrimsonMushroomModel<MountEntity> crimsonMushroom = new CrimsonMushroomModel<>();
+    private final SilverfishModel<MountEntity> silverfishModel = new SilverfishModel<>();
+    private final EndermiteModel<MountEntity> endermiteModel = new EndermiteModel<>();
+
 
     @Override
     public void render(MountEntity mount, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer p_225623_5_, int p_225623_6_) {
@@ -67,6 +75,13 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             if (mount.getTextureType() == 1) this.model = (M) brownMushroom;
             if (mount.getTextureType() == 2) this.model = (M) warpedMushroom;
             if (mount.getTextureType() == 3) this.model = (M) crimsonMushroom;
+        }
+        if (mount.getVanillaType() == EntityType.SILVERFISH){
+            if (mount.getTextureType() == 0) this.model = (M) silverfishModel;
+            if (mount.getTextureType() == 1) this.model = (M) endermiteModel;
+        }
+        if (this.eyesRender != null){
+            this.eyesRender.texture = mount.getTextureType();
         }
         super.render(mount, p_225623_2_, p_225623_3_, matrixStack, p_225623_5_, p_225623_6_);
     }
@@ -173,7 +188,13 @@ public class GenericMountRenderer<M extends EntityModel<MountEntity>> extends Mo
             if (mount.getTextureType() == 3) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/crimsonmushroom.png");
         } else if (mount.getVanillaType() == MountTypes.BLUE_ELEPHANT.get()) {
             if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/blue_elephant_retro.png");
+        } else if (mount.getVanillaType() == EntityType.BEE) {
+            if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/dronebee.png");
+        } else if (mount.getVanillaType() == EntityType.PHANTOM) {
+            if (mount.getTextureType() == 1) return new ResourceLocation(MountablesMain.MOD_ID, "textures/entity/jolly_roger.png");
         }
+
+
 
 
         return TEXTURE_LOCATION;

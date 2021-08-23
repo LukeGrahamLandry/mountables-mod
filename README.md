@@ -45,6 +45,8 @@ A Minecraft mod for Forge 1.16.5 that adds summonable mounts commissioned by The
     - cod (raw cod): raw salmon, cod reverts, puffer fish and again to cycle inflation level
     - bouncy mushroom (red mushroom): textures for red, brown, warped, crimson
     - wisp (soul lantern)
+    - blue elephant 
+    - totem (totem of undying)
     
 ## Support the Developer
 - https://patreon.com/LukeGrahamLandry

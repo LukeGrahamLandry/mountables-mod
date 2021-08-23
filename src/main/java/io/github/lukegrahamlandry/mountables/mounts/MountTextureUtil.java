@@ -114,6 +114,10 @@ public class MountTextureUtil {
             if (itemstack.getItem() == Items.LIGHT_BLUE_DYE) newTexture = 0;
             if (itemstack.getItem() == Items.BLUE_DYE) newTexture = 1;
         }
+        if (vanillaType == EntityType.BEE){
+            if (itemstack.getItem() == Items.HONEYCOMB) newTexture = 0;
+            if (itemstack.getItem() == Items.COMPARATOR) newTexture = 1;
+        }
 
         if (newTexture != -1) mount.setTextureType(newTexture);
         return newTexture != -1 && newTexture != oldTexture;
